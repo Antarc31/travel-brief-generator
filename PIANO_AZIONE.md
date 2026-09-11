@@ -13,7 +13,7 @@ Documento operativo, separato dalla cartella di contesto (00-11): quei file racc
 
 | Decisione | Dettaglio | Stato |
 |---|---|---|
-| Hosting | Netlify (deploy via CLI) | Fatto — https://radiant-tarsier-d8da3a.netlify.app |
+| Hosting | Netlify (deploy via CLI) | Fatto — https://yourtripbrief.netlify.app |
 | Dominio | Sottodominio netlify.app provvisorio, dominio proprio da valutare più avanti | Fatto (provvisorio) |
 
 **Criterio per passare alla Fase 1:** hai un URL pubblico funzionante su cui pubblicare qualcosa. ✅
@@ -25,7 +25,7 @@ Documento operativo, separato dalla cartella di contesto (00-11): quei file racc
 
 - [x] Questionario e generazione brief funzionanti (`generatore-viaggio.html`)
 - [x] Regole di affidabilità dati rafforzate nelle istruzioni AI (fatto/inferenza/ipotesi, fonti ufficiali, coerenza itinerario)
-- [x] Pubblicazione online del prodotto — live su /app/ (https://radiant-tarsier-d8da3a.netlify.app/app/)
+- [x] Pubblicazione online del prodotto — live su /app/ (https://yourtripbrief.netlify.app/app/)
 - [ ] Test end-to-end personale: completare un itinerario vero prima di mandarlo a chiunque
 
 **Criterio per passare alla Fase 2:** hai usato tu stesso il prodotto pubblicato online, dall'inizio alla fine, senza errori bloccanti.

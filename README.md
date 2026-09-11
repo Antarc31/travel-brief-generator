@@ -30,7 +30,7 @@ npx netlify-cli dev
 
 ## Versione live
 
-**https://radiant-tarsier-d8da3a.netlify.app**
+**https://yourtripbrief.netlify.app**
 
 - Landing: `/`
 - Richiesta accesso: `/richiesta-accesso.html`
