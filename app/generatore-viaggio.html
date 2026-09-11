@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organizza il tuo viaggio — Generatore per AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16233A;
+    --ink-soft:#233555;
+    --paper:#FBF4E8;
+    --paper-deep:#F1E6D2;
+    --stamp:#E8395B;
+    --route:#1F9D8B;
+    --gold:#F2A93B;
+    --muted:#5B6B85;
+    --muted-paper:#7C6A52;
+    --line:#DCCFB4;
+    --radius:14px;
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'Inter', -apple-system, sans-serif;
+    --mono:'IBM Plex Mono', 'Courier New', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#EDE7D9;
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    padding:32px 16px 64px;
+  }
+  .app{
+    max-width:900px;
+    margin:0 auto;
+    background:var(--paper);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 30px 60px -30px rgba(22,35,58,0.35);
+  }
+
+  /* ---------- HEADER ---------- */
+  header{background:var(--ink);color:var(--paper);padding:40px 40px 0;}
+  header h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4vw,38px);letter-spacing:-0.01em;margin:0 0 14px;max-width:22ch;}
+  header p.lede{font-size:16px;color:#C7D0E0;max-width:56ch;margin:0 0 28px;}
+  .route-divider{display:flex;align-items:center;gap:10px;color:#8DA0C4;font-family:var(--mono);font-size:12px;}
+  .route-divider .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none;}
+  .route-divider .line{flex:1;height:1px;background-image:linear-gradient(to right, #8DA0C4 40%, transparent 0%);background-size:8px 1px;background-repeat:repeat-x;}
+  .route-divider svg{flex:none;color:var(--gold);}
+
+  nav.tabs{display:flex;gap:0;margin-top:26px;flex-wrap:wrap;}
+  nav.tabs button{
+    font-family:var(--sans);font-weight:600;font-size:13.5px;color:#AEB9CF;background:transparent;border:none;
+    border-bottom:2px solid transparent;padding:14px 4px 16px;margin-right:24px;cursor:pointer;letter-spacing:0.01em;
+  }
+  nav.tabs button.active{color:var(--paper);border-bottom-color:var(--gold);}
+  nav.tabs button:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+
+  /* ---------- MAIN PANELS ---------- */
+  main{padding:36px 40px 44px;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .progress-route{display:flex;align-items:center;margin-bottom:34px;}
+  .progress-route .seg{flex:1;height:2px;background:var(--line);}
+  .progress-route .seg.done{background:var(--route);}
+  .progress-route .node{flex:none;width:11px;height:11px;border-radius:50%;background:var(--paper);border:2px solid var(--line);}
+  .progress-route .node.done{border-color:var(--route);background:var(--route);}
+  .progress-route .node.current{border-color:var(--stamp);background:var(--stamp);transform:scale(1.2);}
+
+  .step-label{font-family:var(--mono);font-size:12px;color:var(--muted-paper);margin:0 0 6px;}
+  .step h2{font-family:var(--serif);font-size:26px;font-weight:600;margin:0 0 22px;}
+
+  .field{margin-bottom:20px;}
+  .field label{display:block;font-weight:600;font-size:14px;margin-bottom:7px;}
+  .field .help{font-size:13px;color:var(--muted-paper);margin:4px 0 0;}
+  input[type="text"], input[type="number"], input[type="date"], select, textarea{
+    width:100%;font-family:var(--sans);font-size:15px;padding:11px 13px;border:1.5px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);
+  }
+  textarea{resize:vertical;min-height:70px;}
+  input:focus-visible, select:focus-visible, textarea:focus-visible{outline:2px solid var(--route); outline-offset:1px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .checkbox-line{display:flex;align-items:flex-start;gap:9px;margin-bottom:10px;font-size:14px;}
+  .checkbox-line input{margin-top:3px;}
+  .chip-grid{display:flex;flex-wrap:wrap;gap:9px;}
+  .chip{border:1.5px solid var(--line);border-radius:999px;padding:8px 15px;font-size:13.5px;background:#fff;cursor:pointer;user-select:none;}
+  .chip input{position:absolute;opacity:0;pointer-events:none;}
+  .chip.checked{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+  .radio-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .radio-card{flex:1;min-width:130px;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;background:#fff;font-size:13.5px;position:relative;}
+  .radio-card input{position:absolute;opacity:0;pointer-events:none;}
+  .radio-card.checked{border-color:var(--route);box-shadow:0 0 0 1.5px var(--route) inset;}
+  .radio-card strong{display:block;font-size:14px;margin-bottom:2px;}
+
+  fieldset{border:none;padding:0;margin:0;}
+  .hidden{display:none !important;}
+
+  .step-nav{display:flex;justify-content:space-between;align-items:center;margin-top:30px;padding-top:22px;border-top:1px dashed var(--line);}
+  button.btn{font-family:var(--sans);font-weight:600;font-size:14.5px;padding:12px 22px;border-radius:999px;border:none;cursor:pointer;}
+  button.btn.primary{background:var(--ink);color:var(--paper);}
+  button.btn.primary:hover{background:var(--ink-soft);}
+  button.btn.ghost{background:transparent;color:var(--muted);border:1.5px solid var(--line);}
+  button.btn:disabled{opacity:0.35;cursor:not-allowed;}
+  button.btn:focus-visible{outline:2px solid var(--route);outline-offset:2px;}
+  button.btn.gold{background:var(--gold);color:var(--ink);}
+  button.btn.teal{background:var(--route);color:#fff;}
+
+  /* result / ticket */
+  .result h2{font-family:var(--serif);font-size:26px;margin:0 0 6px;}
+  .result > p{color:var(--muted-paper);margin:0 0 20px;}
+  .ticket{background:#fff;border:1.5px solid var(--line);border-radius:10px;position:relative;overflow:hidden;}
+  .ticket::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background-image:radial-gradient(circle, var(--paper) 3px, transparent 3.5px);background-size:14px 14px;background-position:-4px 0;}
+  #briefOutput{width:100%;border:none;resize:vertical;min-height:340px;padding:22px 22px 22px 26px;font-family:var(--mono);font-size:12.8px;line-height:1.65;color:var(--ink);background:transparent;}
+  .result-actions{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;}
+  .copied-msg{font-size:13px;color:var(--route);font-weight:600;margin-left:4px;align-self:center;}
+
+  /* ---------- SCOPE / DISCLAIMER ---------- */
+  .scope-box{background:var(--ink);color:#DDE4F2;border-radius:10px;padding:18px 22px;margin-bottom:30px;font-size:13.8px;}
+  .scope-box strong.title{display:block;color:#fff;font-family:var(--serif);font-size:16.5px;font-weight:600;margin-bottom:8px;}
+  .scope-box ul{margin:0;padding-left:18px;}
+  .scope-box li{margin-bottom:4px;}
+  .scope-box .yes{color:#7FD9C4;}
+  .scope-box .no{color:#F5A5B0;}
+
+  /* ---------- VALIDATION ---------- */
+  .field.field-error input, .field.field-error textarea{border-color:var(--stamp);}
+  .field-error-msg{display:none;color:var(--stamp);font-size:12.5px;margin-top:5px;font-weight:600;}
+  .field.field-error .field-error-msg{display:block;}
+  .form-error{color:var(--stamp);font-size:13px;font-weight:600;margin-top:12px;display:none;}
+
+  /* ---------- COMPARE (passo 1) ---------- */
+  .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px;}
+  @media (max-width:700px){.compare-grid{grid-template-columns:1fr;}}
+  .compare-card{padding:16px 16px 15px;}
+  .compare-card .compare-tag{display:inline-block;font-family:var(--mono);font-size:10.5px;background:var(--paper-deep);color:var(--muted-paper);padding:2px 9px;border-radius:999px;margin:2px 0 9px;}
+  .compare-card ul{margin:0;padding:0;list-style:none;}
+  .compare-card li{font-size:12.8px;line-height:1.55;margin-bottom:5px;padding-left:17px;position:relative;}
+  .compare-card li.pro::before{content:"✓";position:absolute;left:0;color:var(--route);font-weight:700;}
+  .compare-card li.con::before{content:"✗";position:absolute;left:0;color:var(--stamp);font-weight:700;}
+
+  /* ---------- CHOSEN BANNER (passo 2) ---------- */
+  .chosen-banner{background:var(--paper-deep);border-radius:8px;padding:11px 16px;font-size:13.5px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:26px;flex-wrap:wrap;}
+  .chosen-banner button{background:none;border:1.5px solid var(--line);border-radius:999px;padding:5px 13px;font-size:12.5px;cursor:pointer;color:var(--ink);font-family:var(--sans);font-weight:600;}
+
+  /* ---------- GUIDA (passo 3) ---------- */
+  .guide-intro{max-width:62ch;color:var(--muted-paper);margin-bottom:28px;}
+  .guide-steps{list-style:none;margin:0;padding:0;border-left:2px dashed var(--line);}
+  .guide-step{position:relative;padding:0 0 34px 34px;}
+  .guide-step:last-child{padding-bottom:0;}
+  .guide-step::before{content:"";position:absolute;left:-7px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2px solid var(--route);}
+  .guide-step .tag-label{font-family:var(--mono);font-size:11.5px;color:var(--muted-paper);display:block;margin-bottom:4px;}
+  .guide-step h3{font-family:var(--serif);font-size:19px;font-weight:600;margin:0 0 8px;display:flex;align-items:center;gap:10px;}
+  .guide-step h3 svg{flex:none;color:var(--stamp);}
+  .guide-step p{margin:0 0 8px;font-size:14.5px;}
+  .guide-step code, .guide-step pre{font-family:var(--mono);font-size:12.8px;}
+  .guide-step pre{background:var(--ink);color:#E7ECF6;padding:13px 16px;border-radius:8px;overflow-x:auto;margin:8px 0;}
+  .guide-note{background:var(--paper-deep);border-left:3px solid var(--gold);padding:10px 14px;font-size:13.5px;border-radius:0 6px 6px 0;margin-top:8px;}
+  .prereq-box{background:var(--paper-deep);border-radius:10px;padding:18px 22px;margin-bottom:32px;font-size:14px;}
+  .prereq-box strong.title{display:block;font-family:var(--serif);font-size:17px;margin-bottom:8px;}
+  .prereq-box ul{margin:0;padding-left:18px;}
+  .prereq-box li{margin-bottom:4px;}
+
+  .path-chooser{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 16px;}
+  .path-btn{font-family:var(--sans);font-weight:600;font-size:13px;padding:9px 15px;border-radius:999px;border:1.5px solid var(--line);background:#fff;cursor:pointer;color:var(--ink);}
+  .path-btn.active{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+  .path-panel{display:none;}
+  .path-panel.active{display:block;}
+
+  .track-panel{display:none;}
+  .track-panel.active{display:block;}
+
+  .mockup{border-radius:10px;overflow:hidden;margin:10px 0 6px;box-shadow:0 10px 24px -14px rgba(22,35,58,0.4);}
+  .mockup-terminal{background:#1B1F2B;}
+  .mockup-bar{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#11141C;}
+  .mockup-bar .mdot{width:9px;height:9px;border-radius:50%;}
+  .mockup-bar .mdot.r{background:#FF5F57;}
+  .mockup-bar .mdot.y{background:#FEBC2E;}
+  .mockup-bar .mdot.g{background:#28C840;}
+  .mockup-bar .mlabel{margin-left:8px;font-family:var(--mono);font-size:11px;color:#8892A6;}
+  .mockup-terminal .mbody{padding:16px;font-family:var(--mono);font-size:12.5px;color:#B9E6D8;line-height:1.8;}
+  .mockup-terminal .mbody .prompt{color:#7FD9C4;}
+  .mockup-terminal .mbody .out{color:#8892A6;}
+  .mockup-browser{background:#fff;border:1px solid var(--line);}
+  .mockup-browser .mockup-bar{background:#EFEAE0;}
+  .mockup-browser .mockup-bar .mlabel{background:#fff;border-radius:6px;padding:3px 10px;color:#5B6B85;font-size:11px;flex:1;}
+  .mockup-browser .mbody{padding:20px;font-family:var(--sans);}
+  .mockup-app{background:#F5F2EA;border:1px solid var(--line);}
+  .mockup-app .mbody{display:flex;min-height:110px;}
+  .mockup-app .msidebar{width:74px;background:var(--ink);flex:none;}
+  .mockup-app .mmain{flex:1;padding:16px;}
+  .mockup-app .mtabpill{display:inline-block;font-family:var(--mono);font-size:11px;background:var(--gold);color:var(--ink);padding:3px 10px;border-radius:999px;margin-bottom:8px;}
+  .mockup-caption{font-size:12px;color:var(--muted-paper);font-style:italic;margin:0 0 18px;}
+
+  .faq-list{margin-top:14px;}
+  .faq-item{border-top:1px dashed var(--line);}
+  .faq-item:last-child{border-bottom:1px dashed var(--line);}
+  .faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:16px 28px 16px 0;position:relative;font-family:var(--sans);font-weight:600;font-size:14.5px;color:var(--ink);}
+  .faq-q::after{content:"+";position:absolute;right:4px;top:14px;font-size:19px;color:var(--stamp);font-weight:400;}
+  .faq-item.open .faq-q::after{content:"–";}
+  .faq-a{display:none;padding:0 0 16px;font-size:14px;color:var(--muted-paper);max-width:62ch;}
+  .faq-item.open .faq-a{display:block;}
+
+  @media (max-width:600px){
+    body{padding:0;}
+    .app{border-radius:0;}
+    header, main{padding-left:22px;padding-right:22px;}
+    .row2{grid-template-columns:1fr;}
+    nav.tabs button{margin-right:14px;font-size:12.5px;}
+    .mockup-app .mbody{flex-direction:column;}
+    .mockup-app .msidebar{width:100%;height:28px;}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .step{animation:fadeIn .25s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1>Organizza il tuo prossimo viaggio con l'AI</h1>
+    <p class="lede">Scegli quale AI userai, rispondi a poche domande sul tuo viaggio, ottieni un brief pronto che genera una dashboard completa: itinerario, budget, packing list e info pratiche.</p>
+    <div class="route-divider">
+      <span class="dot"></span><span class="line"></span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-1 .1-1.3.5l-.4.6c-.4.6-.2 1.4.4 1.7l5.8 3-2 2.5H4l-1.5 2.5L5 18l1.3 3 2.5-1.5v-3l2.5-2 3 5.8c.3.6 1.1.8 1.7.4l.6-.4c.4-.3.6-.8.5-1.3Z"/></svg>
+      <span class="line"></span><span class="dot"></span>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="scegli">1. Scegli l'AI</button>
+      <button class="tab" data-tab="questionario">2. Questionario</button>
+      <button class="tab" data-tab="guidafinale">3. Guida finale</button>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ================= PASSO 1: SCEGLI L'AI ================= -->
+    <section id="panel-scegli" class="panel active">
+
+      <div class="scope-box">
+        <strong class="title">Prima di tutto, cosa fa davvero questo strumento</strong>
+        <ul>
+          <li class="yes">✓ Costruisce un itinerario, un budget stimato, una packing list e una guida pratica, basandosi su ricerche reali fatte dall'AI.</li>
+          <li class="yes">✓ Puoi modificarlo e rigenerarlo quante volte vuoi, semplicemente chiedendolo di nuovo.</li>
+          <li class="yes">✓ Anche questa pagina funziona da telefono: salvala e portala con te, niente screenshot (dettagli nelle FAQ del passo 3).</li>
+          <li class="no">✗ Non prenota voli, hotel o attività: dovrai prenotarli tu, altrove.</li>
+          <li class="no">✗ Non ha prezzi o disponibilità in tempo reale: trattali come stime da verificare prima di partire.</li>
+        </ul>
+      </div>
+
+      <p class="step-label" style="margin-bottom:6px;">PASSO 1</p>
+      <h2 style="font-family:var(--serif);font-size:27px;margin:0 0 10px;">Scegli quale AI userà il tuo brief</h2>
+      <p class="guide-intro">Il modo in cui ottieni il file finale cambia da un'AI all'altra — soprattutto quanto lavoro manuale ti resta da fare. Guarda vantaggi e svantaggi, poi scegli: potrai sempre tornare qui e cambiare idea.</p>
+
+      <div class="compare-grid">
+
+        <label class="radio-card compare-card">
+          <input type="radio" name="assistente" value="claude">
+          <strong>Claude Code</strong>
+          <span class="compare-tag">A pagamento</span>
+          <ul>
+            <li class="pro">Lavora da solo: cerca, scrive, salva e modifica i file senza copia-incolla</li>
+            <li class="pro">Nessun limite pratico di messaggi</li>
+            <li class="con">Richiede abbonamento Claude Pro, Max, Team o Enterprise</li>
+          </ul>
+        </label>
+
+        <label class="radio-card compare-card">
+          <input type="radio" name="assistente" value="claudeai">
+          <strong>claude.ai</strong>
+          <span class="compare-tag">Gratis</span>
+          <ul>
+            <li class="pro">Scarichi il file con un clic (funzione Artifacts)</li>
+            <li class="pro">Stesso modello di Claude Code, buona qualità del codice; contesto ampio, adatto a brief lunghi</li>
+            <li class="con">Circa 15-40 messaggi ogni 5 ore</li>
+            <li class="con">Non modifica i file da sola: devi chiedere e riscaricare ogni volta</li>
+          </ul>
+        </label>
+
+        <label class="radio-card compare-card">
+          <input type="radio" name="assistente" value="chatgpt">
+          <strong>ChatGPT</strong>
+          <span class="compare-tag">Gratis</span>
+          <ul>
+            <li class="pro">Messaggi di testo praticamente illimitati, ricerca web inclusa</li>
+            <li class="con">Il download automatico del codice non è garantito: dipende dalla modalità attiva</li>
+            <li class="con">Spesso il codice va copiato e salvato a mano</li>
+          </ul>
+        </label>
+
+        <label class="radio-card compare-card">
+          <input type="radio" name="assistente" value="gemini">
+          <strong>Gemini</strong>
+          <span class="compare-tag">Gratis</span>
+          <ul>
+            <li class="pro">Ricerca molto integrata con Google, buona per trovare informazioni aggiornate</li>
+            <li class="pro">Anteprima live del codice mentre lo scrive</li>
+            <li class="con">Nessun download diretto del file: quasi sempre copia-incolla manuale</li>
+          </ul>
+        </label>
+
+      </div>
+
+      <p class="form-error" id="scegliErrorMsg">Seleziona un'AI per continuare.</p>
+
+      <div class="step-nav" style="border-top:none;padding-top:6px;">
+        <span></span>
+        <button type="button" class="btn primary" id="continuaBtn">Continua al questionario →</button>
+      </div>
+    </section>
+
+    <!-- ================= PASSO 2: QUESTIONARIO ================= -->
+    <section id="panel-questionario" class="panel">
+
+      <div class="chosen-banner">
+        <span>Stai generando il brief per: <strong id="chosenLabel">—</strong></span>
+        <button type="button" id="changeAssistente">Cambia AI</button>
+      </div>
+
+      <div class="progress-route" id="progressRoute"></div>
+
+      <form id="wizard">
+
+        <div class="step" data-step="0">
+          <p class="step-label">01 · DOVE</p>
+          <h2>Dove vuoi andare?</h2>
+          <div class="field" id="destinazioneField">
+            <label for="destinazione">Destinazione</label>
+            <input type="text" id="destinazione" name="destinazione" placeholder="Es. Lisbona — oppure Giappone: Tokyo, Kyoto, Osaka">
+            <p class="field-error-msg">Scrivi una destinazione, oppure spunta la casella qui sotto se vuoi un suggerimento.</p>
+          </div>
+          <div class="checkbox-line">
+            <input type="checkbox" id="noDest" name="noDest">
+            <label for="noDest" style="font-weight:400;">Non ho ancora deciso: vorrei che l'AI mi suggerisse una destinazione in base ai miei gusti (li racconto nei prossimi passaggi)</label>
+          </div>
+        </div>
+
+        <div class="step hidden" data-step="1">
+          <p class="step-label">02 · QUANDO</p>
+          <h2>Quando parti?</h2>
+          <div class="checkbox-line">
+            <input type="checkbox" id="dateFlessibili" name="dateFlessibili">
+            <label for="dateFlessibili" style="font-weight:400;">Le date sono flessibili</label>
+          </div>
+          <div id="dateFisse" class="row2">
+            <div class="field">
+              <label for="dataPartenza">Data di partenza</label>
+              <input type="date" id="dataPartenza" name="dataPartenza">
+            </div>
+            <div class="field">
+              <label for="dataRitorno">Data di ritorno</label>
+              <input type="date" id="dataRitorno" name="dataRitorno">
+            </div>
+          </div>
+          <div id="dateFlex" class="row2 hidden">
+            <div class="field">
+              <label for="durataGiorni">Durata (giorni)</label>
+              <input type="number" id="durataGiorni" name="durataGiorni" min="1" placeholder="Es. 7">
+            </div>
+            <div class="field">
+              <label for="periodoIndicativo">Periodo indicativo</label>
+              <input type="text" id="periodoIndicativo" name="periodoIndicativo" placeholder="Es. fine settembre">
+            </div>
+          </div>
+        </div>
+
+        <div class="step hidden" data-step="2">
+          <p class="step-label">03 · CHI VIAGGIA</p>
+          <h2>Chi parte?</h2>
+          <div class="row2">
+            <div class="field">
+              <label for="tipoGruppo">Tipo di viaggio</label>
+              <select id="tipoGruppo" name="tipoGruppo">
+                <option>Da solo/a</option>
+                <option>In coppia</option>
+                <option>Famiglia con bambini</option>
+                <option>Gruppo di amici</option>
+                <option>Viaggio di lavoro</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="numViaggiatori">Numero di persone</label>
+              <input type="number" id="numViaggiatori" name="numViaggiatori" min="1" value="1">
+            </div>
+          </div>
+          <div class="field">
+            <label for="esigenze">Esigenze particolari <span style="font-weight:400;color:var(--muted-paper);">(opzionale)</span></label>
+            <textarea id="esigenze" name="esigenze" placeholder="Es. bambini piccoli (4 e 7 anni), allergie alimentari, mobilità ridotta, paura di volare, animale al seguito..."></textarea>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="nazionalita">Nazionalità del passaporto <span style="font-weight:400;color:var(--muted-paper);">(opzionale)</span></label>
+              <input type="text" id="nazionalita" name="nazionalita" placeholder="Es. italiana">
+              <p class="help">Serve all'AI per controllare se ti servono visto o requisiti particolari.</p>
+            </div>
+            <div class="field">
+              <label for="assicurazione">Assicurazione di viaggio</label>
+              <select id="assicurazione" name="assicurazione">
+                <option>Non ancora, vorrei un promemoria</option>
+                <option>Ce l'ho già</option>
+                <option>Non mi interessa</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="step hidden" data-step="3">
+          <p class="step-label">04 · BUDGET</p>
+          <h2>Qual è il budget?</h2>
+          <div class="field">
+            <label for="fasciaBudget">Fascia di budget</label>
+            <select id="fasciaBudget" name="fasciaBudget">
+              <option>Economico</option>
+              <option>Medio</option>
+              <option>Confortevole</option>
+              <option>Alto / lusso</option>
+              <option value="Cifra precisa">Ho una cifra precisa</option>
+            </select>
+          </div>
+          <div id="cifraPrecisaWrap" class="row2 hidden">
+            <div class="field">
+              <label for="cifraBudget">Cifra totale indicativa</label>
+              <input type="number" id="cifraBudget" name="cifraBudget" min="0" placeholder="Es. 2000">
+            </div>
+            <div class="field">
+              <label for="valuta">Valuta</label>
+              <select id="valuta" name="valuta">
+                <option>EUR</option>
+                <option>USD</option>
+                <option>GBP</option>
+                <option>Altra</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Cosa deve coprire il budget?</label>
+            <div class="chip-grid" id="budgetIncludeGrid">
+              <label class="chip"><input type="checkbox" value="Voli"> Voli</label>
+              <label class="chip"><input type="checkbox" value="Alloggio"> Alloggio</label>
+              <label class="chip"><input type="checkbox" value="Attività ed escursioni"> Attività ed escursioni</label>
+              <label class="chip"><input type="checkbox" value="Cibo"> Cibo</label>
+              <label class="chip"><input type="checkbox" value="Trasporti locali"> Trasporti locali</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="step hidden" data-step="4">
+          <p class="step-label">05 · STILE</p>
+          <h2>Che tipo di viaggio ti piace?</h2>
+          <div class="field">
+            <label>Interessi <span style="font-weight:400;color:var(--muted-paper);">(seleziona quanti ne vuoi)</span></label>
+            <div class="chip-grid" id="interessiGrid">
+              <label class="chip"><input type="checkbox" value="Natura e outdoor"> Natura e outdoor</label>
+              <label class="chip"><input type="checkbox" value="Cultura e musei"> Cultura e musei</label>
+              <label class="chip"><input type="checkbox" value="Cibo ed enogastronomia"> Cibo ed enogastronomia</label>
+              <label class="chip"><input type="checkbox" value="Vita notturna"> Vita notturna</label>
+              <label class="chip"><input type="checkbox" value="Relax e mare"> Relax e mare</label>
+              <label class="chip"><input type="checkbox" value="Shopping"> Shopping</label>
+              <label class="chip"><input type="checkbox" value="Avventura e sport"> Avventura e sport</label>
+              <label class="chip"><input type="checkbox" value="Fotografia e paesaggi"> Fotografia e paesaggi</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Ritmo del viaggio</label>
+            <div class="radio-row" id="ritmoGrid">
+              <label class="radio-card"><input type="radio" name="ritmo" value="Rilassato"><strong>Rilassato</strong>Poche cose al giorno, tempo libero</label>
+              <label class="radio-card"><input type="radio" name="ritmo" value="Bilanciato"><strong>Bilanciato</strong>Un mix equilibrato</label>
+              <label class="radio-card"><input type="radio" name="ritmo" value="Intenso"><strong>Intenso</strong>Vedere il più possibile</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="step hidden" data-step="5">
+          <p class="step-label">06 · DETTAGLI FINALI</p>
+          <h2>Ultimi dettagli</h2>
+          <div class="row2">
+            <div class="field">
+              <label for="alloggio">Alloggio preferito</label>
+              <select id="alloggio" name="alloggio">
+                <option>Nessuna preferenza</option>
+                <option>Hotel</option>
+                <option>B&amp;B</option>
+                <option>Appartamento</option>
+                <option>Ostello</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="trasporto">Trasporto principale</label>
+              <select id="trasporto" name="trasporto">
+                <option>Non so / suggeriscimi tu</option>
+                <option>Auto a noleggio</option>
+                <option>Treno</option>
+                <option>Mezzi pubblici</option>
+                <option>Misto</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="daNonPerdere">Cose da non perdere assolutamente <span style="font-weight:400;color:var(--muted-paper);">(opzionale)</span></label>
+            <textarea id="daNonPerdere" name="daNonPerdere" placeholder="Es. vorrei vedere l'alba a un tempio specifico, provare un ristorante particolare..."></textarea>
+          </div>
+          <div class="field">
+            <label for="daEvitare">Cose da evitare <span style="font-weight:400;color:var(--muted-paper);">(opzionale)</span></label>
+            <textarea id="daEvitare" name="daEvitare" placeholder="Es. niente trekking lunghi, evitare voli con scalo, no crociere..."></textarea>
+          </div>
+          <div class="field">
+            <label for="dettaglioItinerario">Livello di dettaglio dell'itinerario</label>
+            <select id="dettaglioItinerario" name="dettaglioItinerario">
+              <option>Scaletta flessibile, con margine di manovra</option>
+              <option>Giorno per giorno, con orari indicativi</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Quali sezioni <em>aggiuntive</em> vuoi nella dashboard?</label>
+            <p class="help" style="margin:-2px 0 10px;">Itinerario e "Prima di partire" (documenti, assicurazione, emergenze, valuta, connettività) sono sempre incluse: non serve selezionarle.</p>
+            <div class="chip-grid" id="featureGrid">
+              <label class="chip"><input type="checkbox" value="Budget e spese" checked> Budget e spese</label>
+              <label class="chip"><input type="checkbox" value="Packing list" checked> Packing list</label>
+              <label class="chip"><input type="checkbox" value="Mappa e link utili" checked> Mappa e link utili</label>
+              <label class="chip"><input type="checkbox" value="Frasi utili nella lingua locale"> Frasi utili nella lingua locale</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button type="button" class="btn ghost" id="prevBtn" disabled>Indietro</button>
+          <button type="button" class="btn primary" id="nextBtn">Avanti →</button>
+        </div>
+      </form>
+
+      <div id="result" class="result hidden">
+        <h2>Il tuo brief è pronto</h2>
+        <p>Copialo o scaricalo, poi vai al passo <strong>3. Guida finale</strong> per sapere esattamente cosa farne.</p>
+        <p class="guide-note hidden" id="regenNotice">Brief aggiornato automaticamente per la nuova AI scelta — ricopialo o riscaricalo, la versione precedente non è più valida.</p>
+        <div class="ticket">
+          <textarea id="briefOutput" readonly></textarea>
+        </div>
+        <div class="result-actions">
+          <button type="button" class="btn gold" id="copyBtn">Copia il brief</button>
+          <button type="button" class="btn teal" id="downloadBtn">Scarica come .md</button>
+          <button type="button" class="btn ghost" id="editBtn">Modifica risposte</button>
+          <span class="copied-msg hidden" id="copiedMsg">Copiato ✓</span>
+        </div>
+        <div class="step-nav" style="border-top:none;">
+          <span></span>
+          <button type="button" class="btn primary" id="goGuideBtn">Vai alla Guida finale →</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= PASSO 3: GUIDA FINALE ================= -->
+    <section id="panel-guidafinale" class="panel">
+      <p class="step-label" style="margin-bottom:6px;">PASSO 3</p>
+      <h2 style="font-family:var(--serif);font-size:28px;margin:0 0 14px;">Dal brief alla dashboard</h2>
+
+      <div class="track-panel active" id="guide-none">
+        <p class="guide-intro">Prima scegli un'AI nel passo <strong>1. Scegli l'AI</strong>, poi torna qui: i passaggi si adattano automaticamente alla tua scelta.</p>
+      </div>
+
+      <!-- ---- CLAUDE CODE ---- -->
+      <div class="track-panel" id="guide-claude">
+        <p class="guide-intro">Hai scelto <strong>Claude Code</strong>: lavora in autonomia sui file del tuo progetto.</p>
+
+        <div class="prereq-box">
+          <strong class="title">Cosa ti serve prima di iniziare</strong>
+          <ul>
+            <li>Un computer (Mac, Windows o Linux) — non funziona da solo smartphone.</li>
+            <li>Un account Claude con abbonamento <strong>Pro, Max, Team o Enterprise</strong>.</li>
+            <li>Una decina di minuti liberi, di cui la maggior parte è Claude Code che lavora da solo.</li>
+          </ul>
+        </div>
+
+        <ol class="guide-steps">
+          <li class="guide-step">
+            <span class="tag-label">01</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Scarica il brief</h3>
+            <p>Nel passo 2 premi <strong>Scarica come .md</strong> per salvare il file (es. <code>brief-viaggio.md</code>).</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">02</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Apri Claude Code sul tuo progetto</h3>
+            <p>Tre modi per farlo: scegli quello più comodo.</p>
+
+            <div class="path-chooser">
+              <button type="button" class="path-btn active" data-path="desktop">App Desktop — consigliata</button>
+              <button type="button" class="path-btn" data-path="terminal">Terminale</button>
+              <button type="button" class="path-btn" data-path="web">Browser (claude.ai/code)</button>
+            </div>
+
+            <div class="path-panel active" id="path-desktop">
+              <p>La via più semplice se non hai mai usato un terminale.</p>
+              <div class="mockup mockup-app">
+                <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">Claude</span></div>
+                <div class="mbody">
+                  <div class="msidebar"></div>
+                  <div class="mmain">
+                    <span class="mtabpill">Code</span><br>
+                    <span style="font-family:var(--mono);font-size:11.5px;color:var(--muted);">Cartella selezionata: viaggio-lisbona</span>
+                  </div>
+                </div>
+              </div>
+              <p class="mockup-caption">Illustrazione semplificata dell'app — l'interfaccia reale può variare.</p>
+              <p>1. Scarica e installa l'app desktop di Claude, apri l'app e accedi.<br>
+              2. Clicca sulla scheda <strong>Code</strong> in alto.<br>
+              3. Scegli <strong>Locale</strong> → <strong>Seleziona cartella</strong>, crea una cartella nuova (es. <code>viaggio-lisbona</code>) e mettici dentro <code>brief-viaggio.md</code>.</p>
+            </div>
+
+            <div class="path-panel" id="path-terminal">
+              <p>Se sei già a tuo agio da riga di comando.</p>
+              <div class="mockup mockup-terminal">
+                <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">terminale</span></div>
+                <div class="mbody">
+                  <span class="prompt">$</span> curl -fsSL https://claude.ai/install.sh | bash<br>
+                  <span class="out">Claude Code successfully installed!</span><br>
+                  <span class="prompt">$</span> cd viaggio-lisbona<br>
+                  <span class="prompt">$</span> claude
+                </div>
+              </div>
+              <p class="mockup-caption">Illustrazione del terminale — il testo reale può variare leggermente.</p>
+              <pre>macOS / Linux:
+curl -fsSL https://claude.ai/install.sh | bash
+
+Windows (PowerShell):
+irm https://claude.ai/install.ps1 | iex</pre>
+              <p>Poi crea la cartella, spostaci dentro il brief, ed entra:</p>
+              <pre>cd viaggio-lisbona
+claude</pre>
+            </div>
+
+            <div class="path-panel" id="path-web">
+              <p>Nessuna installazione: lavori nel browser, in un ambiente cloud.</p>
+              <div class="mockup mockup-browser">
+                <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">claude.ai/code</span></div>
+                <div class="mbody" style="font-size:13px;color:var(--muted);">Nuovo ambiente cloud → incolla il testo del brief nella chat</div>
+              </div>
+              <p class="mockup-caption">Illustrazione del browser — l'interfaccia reale può variare.</p>
+              <p>Vai su <strong>claude.ai/code</strong>, accedi e collega un account GitHub (serve per l'ambiente cloud). Non avendo una cartella locale, usa <strong>Copia il brief</strong> nel passo 2 e incolla il testo direttamente come primo messaggio.</p>
+              <div class="guide-note">Richiede un account GitHub: se è la prima volta che senti questi nomi, ti consigliamo l'App Desktop.</div>
+            </div>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">03</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg>Dai il brief a Claude Code</h3>
+            <p>Scrivi qualcosa come:</p>
+            <pre>Leggi il file brief-viaggio.md in questa cartella
+e segui le istruzioni che contiene per creare
+la mia dashboard di viaggio.</pre>
+            <p>Se hai copiato il brief invece di scaricarlo, incollalo direttamente come primo messaggio.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">04</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6l-9-4Z"/></svg>Lascia lavorare Claude Code</h3>
+            <p>Cercherà informazioni reali sulla destinazione, costruirà l'itinerario e genererà il file HTML della dashboard. Può richiedere qualche minuto.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">05</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20"/></svg>Apri la tua dashboard</h3>
+            <p>Troverai un file tipo <code>dashboard-viaggio.html</code> nella cartella. Aprilo con doppio click.</p>
+            <div class="mockup mockup-browser">
+              <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">dashboard-viaggio.html</span></div>
+              <div class="mbody" style="font-size:13px;color:var(--muted);">Itinerario · Budget · Packing list · Info pratiche</div>
+            </div>
+            <p class="mockup-caption">Illustrazione della dashboard finale — il risultato reale dipende dal tuo brief.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">06</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6"/></svg>Modifica quando vuoi</h3>
+            <p>Torna nella stessa conversazione e chiedi modifiche: "aggiungi un giorno extra a Kyoto", "abbassa il budget hotel". Claude Code aggiorna il file da solo.</p>
+          </li>
+        </ol>
+      </div>
+
+      <!-- ---- CLAUDE.AI GRATIS ---- -->
+      <div class="track-panel" id="guide-claudeai">
+        <p class="guide-intro">Hai scelto <strong>claude.ai gratis</strong>: scriverà il codice in chat e potrai scaricarlo con un clic grazie ad Artifacts.</p>
+
+        <div class="prereq-box">
+          <strong class="title">Cosa ti serve prima di iniziare</strong>
+          <ul>
+            <li>Un computer — per aprire il file .html serve un computer, non basta lo smartphone.</li>
+            <li>Un account gratuito su <strong>claude.ai</strong> (basta un'email, nessuna carta di credito).</li>
+          </ul>
+        </div>
+
+        <ol class="guide-steps">
+          <li class="guide-step">
+            <span class="tag-label">01</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia il brief</h3>
+            <p>Nel passo 2 premi <strong>Copia il brief</strong> (qui conviene copiare invece di scaricare: lo incolli direttamente in chat).</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">02</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9Z"/></svg>Apri claude.ai e incolla il brief</h3>
+            <div class="mockup mockup-browser">
+              <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">claude.ai</span></div>
+              <div class="mbody" style="font-size:13px;color:var(--muted);">Nuova chat → incolla il brief come primo messaggio</div>
+            </div>
+            <p class="mockup-caption">Illustrazione del browser — l'interfaccia reale può variare.</p>
+            <p>Accedi con un account gratuito, apri una nuova chat, incolla il testo copiato al passo 1 e invialo.</p>
+            <div class="guide-note">Il piano gratuito ha un limite di circa 15-40 messaggi ogni 5 ore: più che sufficiente per generare (e correggere un paio di volte) una dashboard.</div>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">03</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6l-9-4Z"/></svg>Lascia che cerchi e scriva il codice</h3>
+            <p>Claude cercherà sul web informazioni sulla destinazione e scriverà il codice della dashboard. Nella maggior parte dei casi si apre automaticamente come <strong>Artifact</strong>, un riquadro a parte.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">04</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Scarica il file dall'Artifact</h3>
+            <p>Nel pannello Artifact, in alto, trovi un pulsante <strong>Scarica</strong>: cliccalo e avrai direttamente <code>dashboard-viaggio.html</code>, senza copiare nulla a mano.</p>
+            <div class="guide-note">Se il codice compare come testo normale in chat invece che come Artifact, scrivi "mettilo in un artifact scaricabile" e riprova.</div>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">05</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20"/></svg>Apri la tua dashboard</h3>
+            <p>Apri il file scaricato con doppio click: si apre nel browser.</p>
+            <div class="mockup mockup-browser">
+              <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">dashboard-viaggio.html</span></div>
+              <div class="mbody" style="font-size:13px;color:var(--muted);">Itinerario · Budget · Packing list · Info pratiche</div>
+            </div>
+            <p class="mockup-caption">Illustrazione della dashboard finale — il risultato reale dipende dal tuo brief.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">06</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6"/></svg>Per modificarla</h3>
+            <p>Torna nella stessa chat, chiedi la modifica (es. "aggiungi un giorno extra a Kyoto"), poi scarica di nuovo l'Artifact aggiornato.</p>
+          </li>
+        </ol>
+      </div>
+
+      <!-- ---- CHATGPT GRATIS ---- -->
+      <div class="track-panel" id="guide-chatgpt">
+        <p class="guide-intro">Hai scelto <strong>ChatGPT gratis</strong>: il download automatico non è garantito, quindi prevediamo anche il salvataggio manuale.</p>
+
+        <div class="prereq-box">
+          <strong class="title">Cosa ti serve prima di iniziare</strong>
+          <ul>
+            <li>Un computer — per salvare il file .html serve un computer, non basta lo smartphone.</li>
+            <li>Un account gratuito su <strong>chatgpt.com</strong> (basta un'email).</li>
+          </ul>
+        </div>
+
+        <ol class="guide-steps">
+          <li class="guide-step">
+            <span class="tag-label">01</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia il brief</h3>
+            <p>Nel passo 2 premi <strong>Copia il brief</strong>.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">02</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9Z"/></svg>Apri chatgpt.com e incolla il brief</h3>
+            <div class="mockup mockup-browser">
+              <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">chatgpt.com</span></div>
+              <div class="mbody" style="font-size:13px;color:var(--muted);">Nuova chat → incolla il brief come primo messaggio</div>
+            </div>
+            <p class="mockup-caption">Illustrazione del browser — l'interfaccia reale può variare.</p>
+            <p>Accedi con un account gratuito, apri una nuova chat, incolla il testo copiato e invialo.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">03</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6l-9-4Z"/></svg>Lascia che cerchi e scriva il codice</h3>
+            <p>Cercherà sul web informazioni sulla destinazione e scriverà il codice. A volte si apre in un pannello "Canvas" con un pulsante Scarica, a volte resta come blocco di codice nella chat: dipende dalla modalità attiva in quel momento.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">04</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Ottieni il file</h3>
+            <p>Vedi un pulsante <strong>Scarica</strong> nel pannello Canvas? Usalo e vai al passo 6. Altrimenti, nel riquadro di codice cerca l'icona "Copia" in alto a destra e cliccala (o seleziona tutto con Ctrl+A/Cmd+A e copia con Ctrl+C/Cmd+C), poi vai al passo 5.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">05</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Salva il codice come file .html</h3>
+            <p>Il passaggio più delicato: segui questi passi con calma, l'ordine conta.</p>
+
+            <div class="path-chooser">
+              <button type="button" class="path-btn active" data-path2="chatgpt-win">Windows (Blocco Note)</button>
+              <button type="button" class="path-btn" data-path2="chatgpt-mac">Mac (TextEdit)</button>
+            </div>
+
+            <div class="path-panel active" id="path2-chatgpt-win">
+              <pre>1. Apri "Blocco note" (cercalo nel menu Start)
+2. Incolla il codice copiato (Ctrl+V)
+3. Vai su File → Salva con nome
+4. In "Nome file" scrivi:  dashboard-viaggio.html
+5. In "Tipo file" scegli "Tutti i file", non "Documenti di testo"
+6. Salva</pre>
+              <div class="guide-note">Il passo 5 è quello che si dimentica più spesso: se lo salti, Windows salva un file <code>dashboard-viaggio.html.txt</code> che non si apre come pagina web.</div>
+            </div>
+
+            <div class="path-panel" id="path2-chatgpt-mac">
+              <pre>1. Apri "TextEdit"
+2. Vai su Formato → Testo semplice (PRIMA di incollare)
+3. Incolla il codice copiato (Cmd+V)
+4. Vai su File → Salva
+5. Come nome scrivi:  dashboard-viaggio.html
+6. Salva (se compare un avviso, scegli "Usa .html")</pre>
+              <div class="guide-note">Se salti il passo 2, TextEdit formatta il testo invece di trattarlo come codice puro, e il file non funzionerà.</div>
+            </div>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">06</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20"/></svg>Apri la tua dashboard</h3>
+            <p>Trova il file salvato e aprilo con doppio click.</p>
+            <div class="mockup mockup-browser">
+              <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">dashboard-viaggio.html</span></div>
+              <div class="mbody" style="font-size:13px;color:var(--muted);">Itinerario · Budget · Packing list · Info pratiche</div>
+            </div>
+            <p class="mockup-caption">Illustrazione della dashboard finale — il risultato reale dipende dal tuo brief.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">07</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6"/></svg>Per modificarla</h3>
+            <p>Torna alla chat, chiedi la modifica, poi ripeti i passi 4-6 per ottenere e salvare di nuovo il codice aggiornato.</p>
+          </li>
+        </ol>
+      </div>
+
+      <!-- ---- GEMINI GRATIS ---- -->
+      <div class="track-panel" id="guide-gemini">
+        <p class="guide-intro">Hai scelto <strong>Gemini gratis</strong>: niente download diretto, il copia-incolla manuale è la norma.</p>
+
+        <div class="prereq-box">
+          <strong class="title">Cosa ti serve prima di iniziare</strong>
+          <ul>
+            <li>Un computer — per salvare il file .html serve un computer, non basta lo smartphone.</li>
+            <li>Un account Google gratuito, per usare <strong>gemini.google.com</strong>.</li>
+          </ul>
+        </div>
+
+        <ol class="guide-steps">
+          <li class="guide-step">
+            <span class="tag-label">01</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia il brief</h3>
+            <p>Nel passo 2 premi <strong>Copia il brief</strong>.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">02</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9Z"/></svg>Apri gemini.google.com e incolla il brief</h3>
+            <div class="mockup mockup-browser">
+              <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">gemini.google.com</span></div>
+              <div class="mbody" style="font-size:13px;color:var(--muted);">Nuova chat → incolla il brief come primo messaggio</div>
+            </div>
+            <p class="mockup-caption">Illustrazione del browser — l'interfaccia reale può variare.</p>
+            <p>Accedi con il tuo account Google, apri una nuova chat, incolla il testo copiato e invialo.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">03</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6l-9-4Z"/></svg>Lascia che cerchi e scriva il codice</h3>
+            <p>Gemini è molto integrato con la ricerca Google. Il codice si apre spesso in un pannello "Canvas" con un'anteprima live della pagina — comoda per vedere subito come verrà la dashboard.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">04</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia il codice</h3>
+            <p>Gemini non offre un download diretto del file .html: nel riquadro di codice (dentro o fuori Canvas) cerca l'icona "Copia" e cliccala, oppure seleziona tutto (Ctrl+A/Cmd+A) e copia (Ctrl+C/Cmd+C).</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">05</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Salva il codice come file .html</h3>
+            <p>Il passaggio più delicato: segui questi passi con calma, l'ordine conta.</p>
+
+            <div class="path-chooser">
+              <button type="button" class="path-btn active" data-path2="gemini-win">Windows (Blocco Note)</button>
+              <button type="button" class="path-btn" data-path2="gemini-mac">Mac (TextEdit)</button>
+            </div>
+
+            <div class="path-panel active" id="path2-gemini-win">
+              <pre>1. Apri "Blocco note" (cercalo nel menu Start)
+2. Incolla il codice copiato (Ctrl+V)
+3. Vai su File → Salva con nome
+4. In "Nome file" scrivi:  dashboard-viaggio.html
+5. In "Tipo file" scegli "Tutti i file", non "Documenti di testo"
+6. Salva</pre>
+              <div class="guide-note">Il passo 5 è quello che si dimentica più spesso: se lo salti, Windows salva un file <code>dashboard-viaggio.html.txt</code> che non si apre come pagina web.</div>
+            </div>
+
+            <div class="path-panel" id="path2-gemini-mac">
+              <pre>1. Apri "TextEdit"
+2. Vai su Formato → Testo semplice (PRIMA di incollare)
+3. Incolla il codice copiato (Cmd+V)
+4. Vai su File → Salva
+5. Come nome scrivi:  dashboard-viaggio.html
+6. Salva (se compare un avviso, scegli "Usa .html")</pre>
+              <div class="guide-note">Se salti il passo 2, TextEdit formatta il testo invece di trattarlo come codice puro, e il file non funzionerà.</div>
+            </div>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">06</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20"/></svg>Apri la tua dashboard</h3>
+            <p>Trova il file salvato e aprilo con doppio click.</p>
+            <div class="mockup mockup-browser">
+              <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">dashboard-viaggio.html</span></div>
+              <div class="mbody" style="font-size:13px;color:var(--muted);">Itinerario · Budget · Packing list · Info pratiche</div>
+            </div>
+            <p class="mockup-caption">Illustrazione della dashboard finale — il risultato reale dipende dal tuo brief.</p>
+          </li>
+
+          <li class="guide-step">
+            <span class="tag-label">07</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6"/></svg>Per modificarla</h3>
+            <p>Torna alla chat, chiedi la modifica, poi ripeti i passi 4-6 per copiare e salvare di nuovo il codice aggiornato.</p>
+          </li>
+        </ol>
+      </div>
+
+      <h2 style="font-family:var(--serif);font-size:23px;margin:44px 0 6px;">Esporta la dashboard sul telefono, prima di partire</h2>
+      <p class="guide-intro">Una volta che <code>dashboard-viaggio.html</code> è pronto sul computer, portalo sul telefono così — vale qualunque AI tu abbia usato per generarlo. Fallo <strong>prima di partire</strong>, con calma, non in viaggio.</p>
+
+      <div class="path-chooser" id="exportChooser">
+        <button type="button" class="path-btn active" data-path3="iphone">iPhone</button>
+        <button type="button" class="path-btn" data-path3="android">Android</button>
+      </div>
+
+      <div class="path-panel active" id="path3-iphone">
+        <div class="guide-note" style="margin-bottom:20px;">Apple ha bloccato negli ultimi aggiornamenti di iOS l'apertura di un file HTML locale direttamente in Safari, per motivi di sicurezza: l'anteprima nell'app File resta, ma non esegue JavaScript, quindi le sezioni interattive (packing list, budget) non funzionerebbero. Il metodo qui sotto aggira il problema mettendo il file online con un link vero, che Safari apre normalmente.</div>
+
+        <ol class="guide-steps">
+          <li class="guide-step">
+            <span class="tag-label">A</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>Rinomina il file in <code>index.html</code></h3>
+            <p>Sul computer, prima di caricarlo, rinomina il file scaricato in esattamente <code>index.html</code> (tutto minuscolo). È il passaggio che evita l'errore "Page not found" più comune: Netlify mostra automaticamente solo un file con questo nome quando apri il link principale del sito — con qualsiasi altro nome, quel link resta vuoto anche se il sito esiste.</p>
+          </li>
+          <li class="guide-step">
+            <span class="tag-label">B</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9Z"/></svg>Vai su app.netlify.com/drop e trascina il file</h3>
+            <p>È un servizio gratuito per pubblicare file HTML online: nessun account richiesto per il primo caricamento. Trascina <code>index.html</code> direttamente sulla pagina. In pochi secondi ottieni un link tipo <code>https://nome-a-caso-123.netlify.app</code>.</p>
+            <div class="mockup mockup-browser">
+              <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">app.netlify.com/drop</span></div>
+              <div class="mbody" style="font-size:13px;color:var(--muted);">Trascina qui il file index.html</div>
+            </div>
+            <p class="mockup-caption">Illustrazione del browser — l'interfaccia reale può variare.</p>
+          </li>
+          <li class="guide-step">
+            <span class="tag-label">C</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>"Rivendica" il link (importante)</h3>
+            <p>Senza un account, il link scade dopo poche ore. Il sito ti proporrà di crearne uno gratuito (basta un'email) per "rivendicare" (claim) quel link e tenerlo attivo per tutta la durata del viaggio. Fallo, altrimenti rischi di trovarlo scaduto quando sei già partito.</p>
+          </li>
+          <li class="guide-step">
+            <span class="tag-label">D</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6l-9-4Z"/></svg>Manda il link al telefono e aprilo in Safari</h3>
+            <p>Mandati il link (email, messaggio, note) e aprilo in Safari: funziona come un sito vero, packing list e budget compresi. Poi tocca l'icona di condivisione → <strong>"Aggiungi a Home"</strong> per avere un'icona a tutti gli effetti.</p>
+          </li>
+        </ol>
+        <div class="guide-note">Vedi comunque "Page not found"? Il file caricato su Netlify probabilmente non si chiamava <code>index.html</code> (attenzione anche a maiuscole/minuscole: <code>Index.html</code> non basta). Due modi per risolvere: ricarica il file dopo averlo rinominato correttamente, oppure — soluzione rapida senza ricaricare nulla — aggiungi il nome esatto del file alla fine del link, es. <code>https://nome-a-caso.netlify.app/dashboard-viaggio.html</code>.</div>
+        <div class="guide-note">Il link è pubblico ma con un indirizzo casuale e non indicizzato: chiunque non lo conosca non lo trova. Non contiene però una password, quindi non condividerlo pubblicamente se ci sono dati che preferisci tenere privati.</div>
+      </div>
+
+      <div class="path-panel" id="path3-android">
+        <p class="guide-intro" style="margin-bottom:20px;">Su Android hai due strade, entrambe affidabili: mettere il file online (più comodo, un solo link) oppure aprirlo in locale (niente da caricare online).</p>
+
+        <p class="step-label" style="margin-bottom:6px;">OPZIONE 1 · più comoda</p>
+        <h3 style="font-family:var(--serif);font-size:19px;margin:0 0 12px;">Metti il file online con un link</h3>
+        <ol class="guide-steps">
+          <li class="guide-step">
+            <span class="tag-label">A</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>Rinomina il file in <code>index.html</code></h3>
+            <p>Sul computer, prima di caricarlo, rinomina il file in esattamente <code>index.html</code> (tutto minuscolo). Evita l'errore "Page not found": Netlify mostra automaticamente solo un file con questo nome quando apri il link principale del sito.</p>
+          </li>
+          <li class="guide-step">
+            <span class="tag-label">B</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9Z"/></svg>Vai su app.netlify.com/drop e trascina il file</h3>
+            <p>Servizio gratuito per pubblicare file HTML online, nessun account richiesto per il primo caricamento. Trascina <code>index.html</code> sulla pagina: ottieni un link tipo <code>https://nome-a-caso-123.netlify.app</code>.</p>
+          </li>
+          <li class="guide-step">
+            <span class="tag-label">C</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>"Rivendica" il link</h3>
+            <p>Crea un account gratuito (basta un'email) per "rivendicarlo" e tenerlo attivo per tutto il viaggio, altrimenti scade dopo poche ore.</p>
+          </li>
+          <li class="guide-step">
+            <span class="tag-label">D</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6l-9-4Z"/></svg>Manda il link al telefono e aprilo in Chrome</h3>
+            <p>Mandati il link e aprilo in Chrome: funziona come un sito vero. Poi tre puntini in alto a destra → <strong>"Aggiungi a schermata Home"</strong> per avere un'icona a tutti gli effetti.</p>
+          </li>
+        </ol>
+        <div class="guide-note">Vedi comunque "Page not found"? Il file caricato probabilmente non si chiamava <code>index.html</code>. Due modi per risolvere: ricaricalo dopo averlo rinominato correttamente, oppure aggiungi il nome esatto del file alla fine del link, es. <code>https://nome-a-caso.netlify.app/dashboard-viaggio.html</code>.</div>
+
+        <p class="step-label" style="margin:26px 0 6px;">OPZIONE 2 · senza mettere nulla online</p>
+        <h3 style="font-family:var(--serif);font-size:19px;margin:0 0 12px;">Apri il file in locale</h3>
+        <ol class="guide-steps">
+          <li class="guide-step">
+            <span class="tag-label">A</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Manda il file al telefono</h3>
+            <p>Email a te stesso, Google Drive/Dropbox, oppure via cavo USB (modalità "Trasferimento file", copia nella cartella Download).</p>
+          </li>
+          <li class="guide-step">
+            <span class="tag-label">B</span>
+            <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9Z"/></svg>Aprilo con Chrome</h3>
+            <p>Nell'app File (o "File di Google"), cartella Download, tocca il file: Android proporrà "Apri con" — scegli Chrome, e "Sempre" se te lo chiede.</p>
+          </li>
+        </ol>
+        <div class="guide-note">Con questa opzione, riapri sempre la stessa copia del file: se te la reinvii più volte rischi di aprirne una diversa, "vuota", perdendo le spunte già fatte.</div>
+      </div>
+
+      <h2 style="font-family:var(--serif);font-size:23px;margin:44px 0 4px;">Domande frequenti</h2>
+      <div class="faq-list">
+
+        <div class="faq-item">
+          <button type="button" class="faq-q">Devo per forza pagare un abbonamento?</button>
+          <div class="faq-a">No. claude.ai gratis, ChatGPT e Gemini sono tutti e tre gratuiti e possono generare la dashboard. Solo Claude Code, la modalità che lavora da sola sui file, richiede un abbonamento Claude Pro/Max/Team/Enterprise.</div>
+        </div>
+
+        <div class="faq-item">
+          <button type="button" class="faq-q">L'AI prenoterà davvero voli e hotel per me?</button>
+          <div class="faq-a">No, con nessuna delle quattro opzioni, e diffida di chi promette il contrario. L'AI crea itinerario, budget stimato e organizzazione, ma tutte le prenotazioni restano da fare tu, sui siti ufficiali.</div>
+        </div>
+
+        <div class="faq-item">
+          <button type="button" class="faq-q">Ho scelto l'AI sbagliata, posso cambiarla?</button>
+          <div class="faq-a">Sì: torna al passo 1, scegli un'altra AI, poi vai al passo 3 per vedere la guida aggiornata. Le risposte al questionario restano quelle che hai già dato.</div>
+        </div>
+
+        <div class="faq-item">
+          <button type="button" class="faq-q">Ho salvato il file .html ma non si apre come pagina web</button>
+          <div class="faq-a">Il problema quasi sempre è l'estensione: su Windows controlla che il file non si chiami in realtà <code>dashboard-viaggio.html.txt</code> (succede se non scegli "Tutti i file" nel salvataggio). Su Mac controlla di aver messo TextEdit in "Testo semplice" prima di incollare il codice.</div>
+        </div>
+
+        <div class="faq-item">
+          <button type="button" class="faq-q">Se spunto la packing list o inserisco le spese reali, i dati restano dopo che chiudo la pagina?</button>
+          <div class="faq-a">Sì: il brief chiede esplicitamente all'AI di salvare questi dati nella memoria locale del browser (localStorage), quindi riaprendo lo stesso file, sullo stesso browser e dispositivo, li ritrovi. Attenzione ai limiti: non è un salvataggio nel cloud, quindi non si sincronizza tra dispositivi diversi (es. computer e telefono restano separati), e si perde se cancelli i dati di navigazione del browser o se apri il file da un browser diverso. Per condividere lo stato con chi viaggia con te, la soluzione più semplice resta rimandare il file aggiornato.</div>
+        </div>
+
+        <div class="faq-item">
+          <button type="button" class="faq-q">Posso condividere la dashboard con chi viaggia con me?</button>
+          <div class="faq-a">Sì: è un singolo file HTML, quindi puoi mandarlo via email, WhatsApp o Drive. Chi lo riceve non ha bisogno di un account per aprirlo. È un file "statico": se uno di voi lo modifica, le modifiche non si sincronizzano sulle altre copie.</div>
+        </div>
+
+        <div class="faq-item">
+          <button type="button" class="faq-q">I dati nella dashboard sono aggiornati e affidabili al 100%?</button>
+          <div class="faq-a">L'AI fa ricerche reali sul web mentre lavora, ma può capitare che qualche dettaglio sia impreciso o cambi nel tempo (prezzi, orari, requisiti di visto), con qualsiasi delle quattro opzioni. Trattala come una base di lavoro solida, non come una fonte ufficiale: prima di partire ricontrolla sempre documenti, prenotazioni e orari sui siti ufficiali.</div>
+        </div>
+
+        <div class="faq-item">
+          <button type="button" class="faq-q">Posso usare tutto questo dal telefono, se sono già in viaggio senza computer?</button>
+          <div class="faq-a">Questo strumento sì, senza problemi: puoi salvare questa pagina sul telefono (te la mandi via email o la metti su Drive) e usarla offline — guida, questionario e brief funzionano interamente nel browser del telefono, senza bisogno di screenshot. Generare la dashboard <em>mentre sei già in viaggio, solo con il telefono</em>, invece, ha più attrito: su claude.ai il download dell'Artifact da mobile a volte non è immediato come da desktop (in quel caso chiedi "mostrami il codice completo" e copialo); su ChatGPT e Gemini da telefono non c'è un modo semplice per salvare il codice come file .html, perché manca l'equivalente mobile del "Blocco Note". Il consiglio pratico: genera la dashboard prima di partire, da computer, poi esportala sul telefono — trovi la guida passo-passo per iPhone e Android qui sopra, appena prima delle FAQ.</div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const totalSteps = steps.length;
+  let current = 0;
+  let assistenteScelto = null;
+
+  const assistenteLabels = {claude:'Claude Code', claudeai:'claude.ai (gratis)', chatgpt:'ChatGPT (gratis)', gemini:'Gemini (gratis)'};
+
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const wizard = document.getElementById('wizard');
+  const result = document.getElementById('result');
+  const progressRoute = document.getElementById('progressRoute');
+
+  const stepNames = ['Dove','Quando','Chi','Budget','Stile','Dettagli'];
+
+  function buildProgress(){
+    progressRoute.innerHTML = '';
+    for(let i=0;i<totalSteps;i++){
+      const node = document.createElement('div');
+      node.className = 'node';
+      node.title = stepNames[i];
+      progressRoute.appendChild(node);
+      if(i < totalSteps-1){
+        const seg = document.createElement('div');
+        seg.className = 'seg';
+        progressRoute.appendChild(seg);
+      }
+    }
+  }
+  function updateProgress(){
+    const nodes = progressRoute.querySelectorAll('.node');
+    const segs = progressRoute.querySelectorAll('.seg');
+    nodes.forEach((n,i)=>{
+      n.classList.remove('done','current');
+      if(i<current) n.classList.add('done');
+      if(i===current) n.classList.add('current');
+    });
+    segs.forEach((s,i)=>{ s.classList.toggle('done', i<current); });
+  }
+  buildProgress();
+  updateProgress();
+
+  function showStep(i){
+    steps.forEach(s=>s.classList.add('hidden'));
+    steps[i].classList.remove('hidden');
+    prevBtn.disabled = (i===0);
+    nextBtn.textContent = (i===totalSteps-1) ? 'Genera il brief →' : 'Avanti →';
+    updateProgress();
+  }
+
+  function validateCurrentStep(){
+    if(current === 0){
+      const destField = document.getElementById('destinazioneField');
+      const noDest = document.getElementById('noDest').checked;
+      const filled = document.getElementById('destinazione').value.trim().length > 0;
+      const ok = noDest || filled;
+      destField.classList.toggle('field-error', !ok);
+      if(!ok) destField.scrollIntoView({behavior:'smooth', block:'center'});
+      return ok;
+    }
+    return true;
+  }
+
+  prevBtn.addEventListener('click', ()=>{ if(current>0){ current--; showStep(current); } });
+  nextBtn.addEventListener('click', ()=>{
+    if(!validateCurrentStep()) return;
+    if(current<totalSteps-1){ current++; showStep(current); }
+    else { generateBrief(); }
+  });
+
+  document.getElementById('destinazione').addEventListener('input', ()=>{
+    document.getElementById('destinazioneField').classList.remove('field-error');
+  });
+  document.getElementById('noDest').addEventListener('change', ()=>{
+    document.getElementById('destinazioneField').classList.remove('field-error');
+  });
+
+  const dateFlessibili = document.getElementById('dateFlessibili');
+  dateFlessibili.addEventListener('change', ()=>{
+    document.getElementById('dateFisse').classList.toggle('hidden', dateFlessibili.checked);
+    document.getElementById('dateFlex').classList.toggle('hidden', !dateFlessibili.checked);
+  });
+
+  const fasciaBudget = document.getElementById('fasciaBudget');
+  fasciaBudget.addEventListener('change', ()=>{
+    document.getElementById('cifraPrecisaWrap').classList.toggle('hidden', fasciaBudget.value !== 'Cifra precisa');
+  });
+
+  document.querySelectorAll('.chip input, .radio-card input').forEach(input=>{
+    const wrap = input.closest('.chip') || input.closest('.radio-card');
+    if(input.checked) wrap.classList.add('checked');
+    input.addEventListener('change', ()=>{
+      if(input.type === 'radio'){
+        document.querySelectorAll('input[name="'+input.name+'"]').forEach(r=>{
+          r.closest('.radio-card').classList.toggle('checked', r.checked);
+        });
+      } else {
+        wrap.classList.toggle('checked', input.checked);
+      }
+    });
+  });
+
+  function checkedValues(containerId){
+    return Array.from(document.querySelectorAll('#'+containerId+' input:checked')).map(i=>i.value);
+  }
+  function val(id){ return document.getElementById(id).value.trim(); }
+
+  function generateBrief(){
+    const destinazione = document.getElementById('noDest').checked
+      ? '(da suggerire — vedi gusti sotto)'
+      : (val('destinazione') || '(non specificata)');
+
+    let quando;
+    if(dateFlessibili.checked){
+      const d = val('durataGiorni') || '(?)';
+      const p = val('periodoIndicativo') || '(periodo non specificato)';
+      quando = 'Date flessibili — durata indicativa: ' + d + ' giorni, periodo: ' + p;
+    } else {
+      const dp = val('dataPartenza') || '(non specificata)';
+      const dr = val('dataRitorno') || '(non specificata)';
+      quando = 'Partenza: ' + dp + ' — Ritorno: ' + dr;
+    }
+
+    const tipoGruppo = val('tipoGruppo');
+    const numViaggiatori = val('numViaggiatori') || '1';
+    const esigenze = val('esigenze') || 'Nessuna indicata';
+    const nazionalita = val('nazionalita') || 'non specificata';
+    const assicurazione = val('assicurazione');
+
+    const fascia = fasciaBudget.value;
+    let budgetLine = 'Fascia: ' + fascia;
+    if(fascia === 'Cifra precisa'){
+      budgetLine = 'Budget totale: ' + (val('cifraBudget') || '(?)') + ' ' + val('valuta');
+    }
+    const budgetIncludes = checkedValues('budgetIncludeGrid');
+
+    const interessi = checkedValues('interessiGrid');
+    const ritmoInput = document.querySelector('input[name="ritmo"]:checked');
+    const ritmo = ritmoInput ? ritmoInput.value : '(non specificato)';
+
+    const alloggio = val('alloggio');
+    const trasporto = val('trasporto');
+    const daNonPerdere = val('daNonPerdere') || 'Nessuna indicazione particolare';
+    const daEvitare = val('daEvitare') || 'Nessuna indicazione particolare';
+    const dettaglioItinerario = val('dettaglioItinerario');
+    const features = checkedValues('featureGrid');
+
+    const assistente = assistenteScelto || 'claude';
+
+    const testi = {
+      claude: {
+        intro: `Questo brief è pensato per essere letto da Claude Code, che lavora in autonomia sui file del progetto (vedi il passo 3 per i passaggi esatti).`,
+        consegna: `**Come consegnare il risultato.** Crea **un unico file HTML autosufficiente** (CSS e JS inclusi nello stesso file, nessuna dipendenza esterna necessaria) e salvalo come \`dashboard-viaggio.html\` nella cartella del progetto.`,
+        finale: `**Alla fine**, apri o mostra il file generato e riassumi in poche righe cosa hai creato e cosa conviene verificare più avanti (es. prenotazioni da confermare, prezzi da ricontrollare).`
+      },
+      claudeai: {
+        intro: `Questo brief è pensato per essere incollato in una chat su claude.ai (piano gratuito, vedi il passo 3 per i passaggi esatti).`,
+        consegna: `**Come consegnare il risultato.** Non hai accesso al file system di chi ti sta parlando. Crea la dashboard come **Artifact** (un unico file HTML autosufficiente, CSS e JS inclusi, nessuna dipendenza esterna), così la persona può scaricarlo con un clic. Se per qualche motivo non si apre come Artifact, restituisci comunque tutto il codice in un unico blocco di codice HTML completo.`,
+        finale: `**Alla fine**, se non hai potuto creare un Artifact scaricabile, ricorda in una riga che il codice va copiato e salvato manualmente come file .html (la persona ha le istruzioni per farlo). Riassumi cosa hai creato e cosa conviene verificare più avanti.`
+      },
+      chatgpt: {
+        intro: `Questo brief è pensato per essere incollato in una chat su ChatGPT (piano gratuito, vedi il passo 3 per i passaggi esatti, incluso come ottenere il file finale).`,
+        consegna: `**Come consegnare il risultato.** Non hai accesso al file system di chi ti sta parlando: non provare a "salvare" nulla da solo. Restituisci l'intero codice della dashboard in **un unico blocco di codice HTML**, completo e pronto da usare (CSS e JS inclusi nello stesso blocco, nessuna dipendenza esterna). Se hai un pannello Canvas con un pulsante Scarica, usalo; altrimenti la persona copierà il blocco di codice e lo salverà come file .html a mano.`,
+        finale: `**Alla fine**, ricorda in una riga che, se non è stato possibile scaricarlo direttamente, il codice va copiato e salvato manualmente come file .html (la persona ha le istruzioni per farlo). Riassumi cosa hai creato e cosa conviene verificare più avanti.`
+      },
+      gemini: {
+        intro: `Questo brief è pensato per essere incollato in una chat su Gemini (piano gratuito, vedi il passo 3 per i passaggi esatti, incluso come ottenere il file finale).`,
+        consegna: `**Come consegnare il risultato.** Non hai un modo diretto per far scaricare un file alla persona: restituisci l'intero codice della dashboard in **un unico blocco di codice HTML**, completo e pronto da usare (CSS e JS inclusi nello stesso blocco, nessuna dipendenza esterna), anche se lo mostri in anteprima in Canvas. La persona copierà il codice e lo salverà come file .html a mano.`,
+        finale: `**Alla fine**, ricorda in una riga che il codice va copiato e salvato manualmente come file .html (la persona ha le istruzioni per farlo). Riassumi cosa hai creato e cosa conviene verificare più avanti.`
+      }
+    };
+    const t = testi[assistente] || testi.claude;
+
+    const md = `# Brief di viaggio
+
+Questo brief è stato generato con il questionario "Organizza il tuo viaggio con l'AI". Contiene i dati del viaggio e, in fondo, le istruzioni operative per l'assistente AI che lo leggerà. ${t.intro}
+
+## Dati del viaggio
+
+- **Destinazione:** ${destinazione}
+- **Quando:** ${quando}
+- **Chi parte:** ${tipoGruppo}, ${numViaggiatori} persona/e
+- **Esigenze particolari:** ${esigenze}
+- **Nazionalità del passaporto:** ${nazionalita}
+- **Assicurazione di viaggio:** ${assicurazione}
+- **Budget:** ${budgetLine}
+- **Il budget deve coprire:** ${budgetIncludes.length ? budgetIncludes.join(', ') : 'non specificato, stima in modo ragionevole'}
+- **Interessi:** ${interessi.length ? interessi.join(', ') : 'nessuno specificato, proponi un mix equilibrato'}
+- **Ritmo del viaggio:** ${ritmo}
+- **Alloggio preferito:** ${alloggio}
+- **Trasporto principale:** ${trasporto}
+- **Da non perdere:** ${daNonPerdere}
+- **Da evitare:** ${daEvitare}
+- **Livello di dettaglio itinerario richiesto:** ${dettaglioItinerario}
+- **Sezioni aggiuntive richieste (oltre a Itinerario e Prima di partire, sempre incluse):** ${features.length ? features.join(', ') : 'nessuna, solo le sezioni fisse'}
+
+## Specifiche di design (segui esattamente questi stili)
+
+La dashboard deve avere lo stesso stile visivo di questo generatore: un'estetica ispirata a biglietti e carte d'imbarco di viaggio, non uno stile generico da SaaS con card identiche e ombre grigie standard.
+
+**Palette colori — usa questi valori esatti come variabili CSS:**
+
+\`\`\`css
+:root{
+  --ink:#16233A;        /* sfondo scuro (header), testo principale */
+  --paper:#FBF4E8;      /* sfondo carta chiaro, superficie principale */
+  --paper-deep:#F1E6D2; /* sfondo carta più scuro, per box informativi */
+  --stamp:#E8395B;      /* accento rosso "timbro", per evidenziare */
+  --route:#1F9D8B;      /* accento verde-teal, conferme e progressi */
+  --gold:#F2A93B;       /* accento oro, bottoni ed elementi in risalto */
+  --muted-paper:#7C6A52;/* testo secondario su sfondo chiaro */
+  --line:#DCCFB4;       /* bordi e linee tratteggiate */
+}
+\`\`\`
+
+**Tipografia:** importa da Google Fonts "Fraunces" (serif con carattere, per i titoli — pesi 500/600/700), "Inter" (sans, per testo e interfaccia), "IBM Plex Mono" (per etichette tipo dati di viaggio: date, orari, codici, numeri del budget).
+
+**Elementi distintivi da riprodurre:**
+- Header con sfondo scuro (--ink), titolo in Fraunces, e un "route-divider": una linea tratteggiata orizzontale con un puntino dorato a ogni estremo e una piccola icona aereo al centro, a simulare una rotta di volo.
+- Le card dell'itinerario giorno per giorno hanno l'aspetto di un biglietto/carta d'imbarco: sfondo chiaro (--paper), bordo sottile (--line), un bordo sinistro "perforato" (una fila di piccoli cerchi che ricorda lo strappo di un biglietto), etichetta del giorno in IBM Plex Mono.
+- Le sezioni informative importanti (documenti, assicurazione, promemoria pratici) vanno in un box con sfondo --paper-deep e un bordo sinistro spesso in --gold, come una nota a margine.
+- Bottoni con angoli molto arrotondati (pill), sfondo --ink o --gold, mai bordi squadrati o ombre grigie generiche.
+- Evita: etichette in maiuscolo sopra ogni titolo, card tutte identiche con la stessa ombra, sfondo crema con accento arancione-terracotta (è un tell tipico dei design generati senza direzione). Cerca ispirazione nel mondo dei biglietti di viaggio reali — passaporti, boarding pass, tag da valigia — non nei dashboard SaaS generici.
+
+**Non una pagina a scorrimento: sezioni separate con navigazione.**
+
+Con tutte queste informazioni, un'unica pagina lunga da scorrere è scomoda per chi cerca una cosa specifica. Costruisci invece una **dashboard a schede**: una barra di navigazione fissa in alto, con un pulsante per ogni sezione — esattamente come la barra in alto di questo stesso generatore (sfondo scuro, pulsante attivo sottolineato in oro). Al clic su un pulsante si mostra solo quella sezione; le altre restano nascoste (con JavaScript, nella stessa pagina — non serve ricaricare). Nessuno scorrimento infinito.
+
+**Sezioni fisse — includile sempre, in questo ordine:**
+1. **Panoramica** — la prima scheda: titolo del viaggio, destinazione, date, numero di viaggiatori, un breve riepilogo dello stile scelto e, se noto, il budget totale. Il route-divider decorativo va qui.
+2. **Itinerario** — giorno per giorno, come card in stile boarding pass.
+3. **Prima di partire** — la checklist pratica/di sicurezza descritta al punto 6 delle istruzioni qui sotto (documenti, assicurazione, emergenze, valuta, connettività), nei box "nota a margine".
+
+**Sezioni opzionali — crea una scheda solo per quelle elencate nel campo "Sezioni aggiuntive richieste" più sopra, nessun'altra:**
+- **Budget e spese** — non solo una stima statica: un tracker interattivo. Per ogni voce di spesa stimata (in base ai dati sopra), aggiungi un campo dove la persona può inserire quanto ha speso realmente durante il viaggio, e mostra la differenza rispetto alla stima (es. "Alloggio: stimati 400€ · spesi 380€ · -20€"). Mostra anche un totale stimato e un totale reale a confronto.
+- **Packing list** — checklist interattiva (le voci si possono spuntare mano a mano che si fa la valigia).
+- **Mappa e link utili**.
+- **Frasi utili nella lingua locale**.
+
+Se una sezione opzionale non compare tra quelle richieste, non crearla affatto: niente scheda vuota o placeholder "prossimamente".
+
+**Salvataggio dei dati inseriti — obbligatorio se crei la Packing list o il tracker Budget.** Chi usa la dashboard spunterà voci della packing list o inserirà spese reali in più sessioni (fa una parte della valigia oggi, il resto domani; segna le spese durante il viaggio, non tutte insieme). Questi dati **devono sopravvivere alla chiusura della pagina**: implementa il salvataggio con \`localStorage\` del browser — ad ogni modifica (spunta di una checkbox, inserimento di una spesa) salva subito lo stato con \`localStorage.setItem(...)\`, e al caricamento della pagina rileggilo con \`localStorage.getItem(...)\` per ripristinare tutto com'era. Usa una chiave fissa e riconoscibile (es. \`viaggio-<destinazione>-packing\` e \`viaggio-<destinazione>-budget\`). Questo salvataggio funziona solo su questo stesso browser e dispositivo, non è condiviso nel cloud: è normale e va bene così, ma se lo dici esplicitamente da qualche parte nella dashboard (una piccola nota, non invadente) aiuta la persona a capire il limite.
+
+Segui questa struttura e questi stili esattamente, indipendentemente da quale AI stai generando: l'obiettivo è che la dashboard abbia sempre lo stesso aspetto e la stessa organizzazione, qualunque assistente la costruisca.
+
+## Istruzioni per l'assistente AI
+
+Sei un assistente di viaggio. Usa i dati sopra per costruire una dashboard di viaggio personalizzata.
+
+**Prima regola, sopra tutte le altre: l'affidabilità dei dati conta più della grafica.** Una dashboard bellissima ma con un orario, un prezzo o un indirizzo inventato è peggio di una dashboard essenziale ma corretta — perché la persona la userà per decisioni reali (dove andare, quanto spendere, quando presentarsi). Tieni questo principio attivo in ogni sezione che scrivi, non solo al punto 5.
+
+Procedi in questo ordine:
+
+1. **Ricerca reale.** Se la destinazione è nota, cerca sul web informazioni aggiornate: meteo indicativo nel periodo indicato, eventi o festività locali, principali attrazioni in linea con gli interessi indicati, documenti di viaggio richiesti, fuso orario, valuta locale e indicazioni pratiche di sicurezza. Quando possibile, preferisci fonti ufficiali (sito del museo/monumento/comune/ente turistico/trasporto pubblico) a blog o articoli di terzi per orari, prezzi e condizioni di accesso: i blog possono aiutarti a trovare idee, ma non bastano da soli a confermare un dato che cambia nel tempo. Se la destinazione è da suggerire, usa gli interessi, il ritmo e il budget per proporre 2-3 opzioni concrete con una breve motivazione, poi procedi con quella più adatta (o chiedi conferma se il contesto lo permette).
+2. **Itinerario.** Costruisci un itinerario giorno per giorno coerente con il ritmo indicato: non sovraccaricare le giornate se il ritmo è "rilassato", lascia margine per imprevisti, e rispetta le esigenze particolari indicate. Raggruppa le attività per zona per ridurre gli spostamenti inutili, e tieni conto del tempo di spostamento reale tra una tappa e l'altra (non trattarlo come zero). Non proporre due volte la stessa attività in giorni diversi, e non creare contraddizioni tra una giornata e l'altra (es. un luogo indicato come chiuso un giorno e riproposto come tappa il giorno dopo senza spiegazione). Se un'attività richiede una prenotazione, segnalalo esplicitamente nell'itinerario, non solo nella checklist finale.
+3. **Design e struttura.** Applica esattamente le specifiche nella sezione "Specifiche di design" qui sopra — colori, font, e la struttura a schede navigabili con le sezioni fisse e opzionali indicate. Non inventare uno stile o un'organizzazione diversi, e non creare un'unica pagina a scorrimento.
+4. ${t.consegna} Rendila leggibile anche da smartphone (su schermi piccoli le schede possono diventare un menu a tendina o scorrere orizzontalmente, ma restano sezioni separate, non un'unica pagina lunga).
+5. **Affidabilità dei dati — la regola più importante di questo brief.**
+   - Non inventare mai: prezzi, orari, disponibilità, eventi, recensioni, link, numeri di telefono, o nomi di attrazioni/ristoranti/alloggi che non hai trovato nella ricerca. Se un dato non esiste nei risultati che hai trovato, non stimarlo "a occhio" per riempire uno spazio vuoto.
+   - Se un dato non è disponibile, scrivi letteralmente "Informazione non disponibile". Se un dato esiste ma può cambiare prima della partenza (orari, prezzi, chiusure, eventi, regole d'accesso), scrivi "Da verificare prima della partenza" accanto al dato, non come nota a parte facile da ignorare.
+   - Distingui, quando la differenza conta per chi legge, tra: un **fatto** (trovato direttamente nella ricerca), un'**inferenza** (una deduzione ragionevole da più fatti — es. "probabilmente meno affollato al mattino, in base agli orari di apertura e al tipo di luogo": va presentata come deduzione, non come certezza) e un'**ipotesi** (un suggerimento plausibile ma non confermato — es. un locale che sembra adatto ma di cui non hai trovato conferma di apertura nel periodo del viaggio).
+   - Evita formulazioni assolute su dati che possono cambiare. Non scrivere "è sicuramente aperto", "costa X€", "puoi prenotare qui" senza un link verificato nella ricerca. Scrivi invece, ad esempio, "gli orari possono cambiare: verifica sul sito ufficiale prima di organizzare la visita".
+   - Questa regola vale per ogni sezione della dashboard, non solo per l'itinerario: vale anche per Budget e spese (le cifre sono stime, mai importi garantiti), Mappa e link utili (solo link reali trovati nella ricerca, mai inventati), e qualunque altra sezione opzionale richiesta.
+6. **Contenuto della sezione fissa "Prima di partire"** — deve includere sempre:
+   - Validità del passaporto richiesta per la destinazione (in molti paesi è necessaria una validità residua di almeno 6 mesi dal rientro) ed eventuale necessità di visto, in base alla nazionalità indicata sopra.
+   - Promemoria sull'assicurazione di viaggio, solo se l'utente ha indicato di non averla ancora.
+   - Numeri di emergenza locali e, se rilevante, indirizzo dell'ambasciata/consolato del paese di provenienza.
+   - Valuta locale, se si usa più contante o carta, e uso delle mance nella destinazione.
+   - Voltaggio elettrico e tipo di presa, e opzioni di connettività (SIM locale, eSIM, WiFi).
+   - Nella packing list, collega i suggerimenti al meteo reale trovato in ricerca per quel periodo, non a una lista generica.
+7. **Aspettative sui prezzi.** Ricorda chiaramente nella dashboard che questo strumento non prenota nulla e non ha accesso a prezzi o disponibilità in tempo reale: ogni cifra è una stima da verificare sui siti ufficiali prima di prenotare.
+8. ${t.finale}
+`;
+
+    document.getElementById('briefOutput').value = md;
+    wizard.classList.add('hidden');
+    result.classList.remove('hidden');
+    result.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  document.getElementById('editBtn').addEventListener('click', ()=>{
+    result.classList.add('hidden');
+    wizard.classList.remove('hidden');
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', ()=>{
+    const text = document.getElementById('briefOutput').value;
+    navigator.clipboard.writeText(text).then(()=>{
+      const msg = document.getElementById('copiedMsg');
+      msg.classList.remove('hidden');
+      setTimeout(()=>msg.classList.add('hidden'), 2200);
+    });
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', ()=>{
+    const text = document.getElementById('briefOutput').value;
+    const blob = new Blob([text], {type:'text/markdown'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'brief-viaggio.md';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  showStep(0);
+
+  // ---- navigazione tra i 3 passi principali ----
+  function switchToTab(tab){
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+    document.querySelectorAll('main > .panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+tab));
+    if(tab==='guidafinale') showGuideTrack(assistenteScelto);
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  document.querySelectorAll('nav.tabs button').forEach(btn=>{
+    btn.addEventListener('click', ()=> switchToTab(btn.dataset.tab));
+  });
+
+  function showGuideTrack(a){
+    document.querySelectorAll('.track-panel').forEach(p=>p.classList.remove('active'));
+    const el = document.getElementById('guide-'+(a || 'none'));
+    (el || document.getElementById('guide-none')).classList.add('active');
+  }
+
+  document.getElementById('continuaBtn').addEventListener('click', ()=>{
+    const checked = document.querySelector('input[name="assistente"]:checked');
+    const err = document.getElementById('scegliErrorMsg');
+    if(!checked){ err.style.display='block'; return; }
+    err.style.display='none';
+    const cambiato = (assistenteScelto !== null && assistenteScelto !== checked.value);
+    assistenteScelto = checked.value;
+    document.getElementById('chosenLabel').textContent = assistenteLabels[assistenteScelto] || '—';
+    if(cambiato && !result.classList.contains('hidden')){
+      generateBrief();
+      const notice = document.getElementById('regenNotice');
+      notice.classList.remove('hidden');
+      setTimeout(()=>notice.classList.add('hidden'), 3000);
+    }
+    switchToTab('questionario');
+  });
+
+  document.getElementById('changeAssistente').addEventListener('click', ()=> switchToTab('scegli'));
+  document.getElementById('goGuideBtn').addEventListener('click', ()=> switchToTab('guidafinale'));
+
+  // selettore percorso installazione Claude Code (App Desktop / Terminale / Browser)
+  document.querySelectorAll('.guide-step .path-chooser').forEach(chooser=>{
+    const scope = chooser.closest('.guide-step');
+    chooser.querySelectorAll('.path-btn[data-path]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        chooser.querySelectorAll('.path-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        scope.querySelectorAll(':scope > .path-panel').forEach(p=>p.classList.remove('active'));
+        document.getElementById('path-'+btn.dataset.path).classList.add('active');
+      });
+    });
+  });
+
+  // selettore Windows / Mac per il salvataggio manuale (ChatGPT / Gemini)
+  document.querySelectorAll('.guide-step .path-chooser').forEach(chooser=>{
+    const scope = chooser.closest('.guide-step');
+    chooser.querySelectorAll('.path-btn[data-path2]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        chooser.querySelectorAll('.path-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        scope.querySelectorAll(':scope > .path-panel').forEach(p=>p.classList.remove('active'));
+        document.getElementById('path2-'+btn.dataset.path2).classList.add('active');
+      });
+    });
+  });
+
+  // selettore iPhone / Android per l'esportazione sul telefono
+  document.querySelectorAll('#exportChooser .path-btn[data-path3]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#exportChooser .path-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('path3-iphone').classList.remove('active');
+      document.getElementById('path3-android').classList.remove('active');
+      document.getElementById('path3-'+btn.dataset.path3).classList.add('active');
+    });
+  });
+
+  // accordion FAQ
+  document.querySelectorAll('.faq-item').forEach(item=>{
+    item.querySelector('.faq-q').addEventListener('click', ()=>{
+      item.classList.toggle('open');
+    });
+  });
+
+})();
+</script>
+
+</body>
+</html>

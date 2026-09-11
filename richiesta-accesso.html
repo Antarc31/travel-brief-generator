@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Richiedi accesso alla beta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16233A;
+    --ink-soft:#233555;
+    --paper:#FBF4E8;
+    --paper-deep:#F1E6D2;
+    --stamp:#E8395B;
+    --route:#1F9D8B;
+    --gold:#F2A93B;
+    --muted:#5B6B85;
+    --muted-paper:#7C6A52;
+    --line:#DCCFB4;
+    --radius:14px;
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'Inter', -apple-system, sans-serif;
+    --mono:'IBM Plex Mono', 'Courier New', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#EDE7D9;
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    padding:32px 16px 64px;
+  }
+  .card{
+    max-width:640px;
+    margin:0 auto;
+    background:var(--paper);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 30px 60px -30px rgba(22,35,58,0.35);
+  }
+  header{background:var(--ink);color:var(--paper);padding:36px 40px;}
+  header a.back{color:#AEB9CF;font-family:var(--mono);font-size:12.5px;text-decoration:none;display:inline-block;margin-bottom:18px;}
+  header a.back:hover{color:var(--paper);}
+  header h1{font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,30px);letter-spacing:-0.01em;margin:0 0 12px;max-width:24ch;}
+  header p{font-size:14.5px;color:#C7D0E0;max-width:52ch;margin:0;}
+
+  main{padding:32px 40px 40px;}
+
+  .field{margin-bottom:20px;}
+  .field label{display:block;font-weight:600;font-size:14px;margin-bottom:7px;}
+  .field .help{font-size:13px;color:var(--muted-paper);margin:4px 0 0;}
+  input[type="text"], input[type="email"], input[type="number"], select, textarea{
+    width:100%;font-family:var(--sans);font-size:15px;padding:11px 13px;border:1.5px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);
+  }
+  textarea{resize:vertical;min-height:70px;}
+  input:focus-visible, select:focus-visible, textarea:focus-visible{outline:2px solid var(--route);outline-offset:1px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:600px){.row2{grid-template-columns:1fr;}}
+
+  .checkbox-line{display:flex;align-items:flex-start;gap:9px;margin:26px 0 24px;font-size:14px;}
+  .checkbox-line input{margin-top:3px;}
+
+  button.btn{font-family:var(--sans);font-weight:600;font-size:15.5px;padding:14px 26px;border-radius:999px;border:none;cursor:pointer;width:100%;}
+  button.btn.gold{background:var(--gold);color:var(--ink);}
+  button.btn.gold:hover{filter:brightness(1.05);}
+  button.btn:focus-visible{outline:2px solid var(--route);outline-offset:2px;}
+
+  .fieldset-label{font-family:var(--mono);font-size:11.5px;color:var(--muted-paper);text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;}
+
+  @media (max-width:600px){
+    body{padding:0;}
+    .card{border-radius:0;}
+    header, main{padding-left:22px;padding-right:22px;}
+  }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <header>
+    <a class="back" href="index.html">← Torna alla pagina principale</a>
+    <h1>Prima di provare la beta</h1>
+    <p>Qualche domanda veloce: ci serve per capire come stai organizzando il tuo viaggio e per darti accesso alla dashboard.</p>
+  </header>
+
+  <main>
+    <form name="richiesta-accesso" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/grazie.html">
+      <input type="hidden" name="form-name" value="richiesta-accesso">
+      <p style="position:absolute;left:-9999px;">
+        <label>Non compilare questo campo se sei umano: <input name="bot-field" tabindex="-1" autocomplete="off"></label>
+      </p>
+
+      <div class="field">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome" required>
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label for="destinazione">Destinazione</label>
+          <input type="text" id="destinazione" name="destinazione" placeholder="Es. Lisbona" required>
+        </div>
+        <div class="field">
+          <label for="date">Date del viaggio</label>
+          <input type="text" id="date" name="date" placeholder="Es. 12-20 ottobre, o ancora da decidere" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="numViaggiatori">Numero di viaggiatori</label>
+        <input type="number" id="numViaggiatori" name="numViaggiatori" min="1" value="1" required>
+      </div>
+
+      <div class="field">
+        <label for="tipoViaggio">Tipo di viaggio</label>
+        <select id="tipoViaggio" name="tipoViaggio" required>
+          <option value="">Seleziona...</option>
+          <option>Famiglia</option>
+          <option>Coppia</option>
+          <option>Da solo/a</option>
+          <option>Gruppo di amici</option>
+          <option>Viaggio con budget limitato</option>
+          <option>Altro</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="cosaOrganizzare">Cosa vuole organizzare</label>
+        <input type="text" id="cosaOrganizzare" name="cosaOrganizzare" placeholder="Es. itinerario di 10 giorni tra due città" required>
+      </div>
+
+      <div class="field">
+        <label for="partePiuDifficile">Qual è la parte più difficile nell'organizzare questo viaggio?</label>
+        <textarea id="partePiuDifficile" name="partePiuDifficile" required></textarea>
+      </div>
+
+      <div class="field">
+        <label for="comeHaScoperto">Come hai scoperto questo prodotto?</label>
+        <input type="text" id="comeHaScoperto" name="comeHaScoperto">
+      </div>
+
+      <div class="checkbox-line">
+        <input type="checkbox" id="consenso" name="consenso" value="Sì" required>
+        <label for="consenso" style="font-weight:400;">Acconsento a essere ricontattato/a per lasciare un feedback sul prodotto.</label>
+      </div>
+
+      <button type="submit" class="btn gold">Invia e ottieni accesso →</button>
+    </form>
+  </main>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organizza il tuo viaggio in un unico posto</title>
+<meta name="description" content="Inserisci destinazione, date, budget e preferenze. Ricevi un itinerario personalizzato con giornate, attività, spostamenti e dettagli organizzati nella tua dashboard.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16233A;
+    --ink-soft:#233555;
+    --paper:#FBF4E8;
+    --paper-deep:#F1E6D2;
+    --stamp:#E8395B;
+    --route:#1F9D8B;
+    --gold:#F2A93B;
+    --muted:#5B6B85;
+    --muted-paper:#7C6A52;
+    --line:#DCCFB4;
+    --radius:14px;
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'Inter', -apple-system, sans-serif;
+    --mono:'IBM Plex Mono', 'Courier New', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#EDE7D9;
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px;}
+  img,svg{max-width:100%;}
+
+  /* ---------- HERO ---------- */
+  .hero{background:var(--ink);color:var(--paper);padding:56px 0 64px;}
+  .hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.5vw,42px);letter-spacing:-0.01em;margin:0 0 20px;max-width:20ch;}
+  .hero p.lede{font-size:17px;color:#C7D0E0;max-width:56ch;margin:0 0 32px;}
+  .route-divider{display:flex;align-items:center;gap:10px;color:#8DA0C4;font-family:var(--mono);font-size:12px;margin:0 0 30px;}
+  .route-divider .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none;}
+  .route-divider .line{flex:1;height:1px;background-image:linear-gradient(to right, #8DA0C4 40%, transparent 0%);background-size:8px 1px;background-repeat:repeat-x;}
+  .route-divider svg{flex:none;color:var(--gold);}
+
+  .cta-block{margin-top:8px;}
+  .btn{font-family:var(--sans);font-weight:600;font-size:15.5px;padding:15px 30px;border-radius:999px;border:none;cursor:pointer;display:inline-block;text-decoration:none;text-align:center;}
+  .btn.gold{background:var(--gold);color:var(--ink);}
+  .btn.gold:hover{filter:brightness(1.05);}
+  .btn:focus-visible{outline:2px solid var(--route);outline-offset:3px;}
+  .cta-note{font-size:13px;color:#AEB9CF;margin:12px 0 0;}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:56px 0;}
+  section.deep{background:var(--paper-deep);}
+  section.paper{background:var(--paper);}
+  .section-label{font-family:var(--mono);font-size:12px;color:var(--muted-paper);letter-spacing:0.04em;text-transform:uppercase;margin:0 0 10px;}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(22px,3vw,30px);margin:0 0 30px;max-width:26ch;}
+
+  /* placeholder mockup */
+  .mockup{border-radius:10px;overflow:hidden;margin:36px 0 0;box-shadow:0 20px 40px -22px rgba(22,35,58,0.4);border:1.5px dashed var(--line);background:#fff;}
+  .mockup-bar{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#EFEAE0;}
+  .mockup-bar .mdot{width:9px;height:9px;border-radius:50%;}
+  .mockup-bar .mdot.r{background:#FF5F57;}
+  .mockup-bar .mdot.y{background:#FEBC2E;}
+  .mockup-bar .mdot.g{background:#28C840;}
+  .mockup-bar .mlabel{margin-left:8px;background:#fff;border-radius:6px;padding:3px 10px;color:var(--muted);font-family:var(--mono);font-size:11px;flex:1;}
+  .mockup img{display:block;width:100%;}
+  .mockup-caption{font-size:12px;color:var(--muted-paper);font-style:italic;margin:10px 0 0;}
+
+  /* ---------- COME FUNZIONA ---------- */
+  .steps{list-style:none;margin:0;padding:0;border-left:2px dashed var(--line);}
+  .step-item{position:relative;padding:0 0 34px 34px;}
+  .step-item:last-child{padding-bottom:0;}
+  .step-item::before{content:"";position:absolute;left:-7px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--paper-deep);border:2px solid var(--route);}
+  section.paper .step-item::before{background:var(--paper);}
+  .step-item .tag{font-family:var(--mono);font-size:11.5px;color:var(--muted-paper);display:block;margin-bottom:4px;}
+  .step-item h3{font-family:var(--serif);font-size:19px;font-weight:600;margin:0 0 6px;}
+  .step-item p{margin:0;font-size:14.5px;color:var(--ink-soft);max-width:52ch;}
+
+  /* ---------- COSA RICEVI ---------- */
+  .scope-box{background:var(--ink);color:#DDE4F2;border-radius:10px;padding:22px 26px;font-size:14.5px;}
+  .scope-box ul{margin:0;padding-left:18px;}
+  .scope-box li{margin-bottom:10px;}
+  .scope-box li:last-child{margin-bottom:0;}
+  .scope-box .yes{color:#7FD9C4;}
+
+  /* ---------- PER CHI E ---------- */
+  .profile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  @media (max-width:640px){.profile-grid{grid-template-columns:1fr;}}
+  .profile-card{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:18px 20px;}
+  .profile-card strong{display:block;font-family:var(--serif);font-size:16.5px;margin-bottom:6px;}
+  .profile-card p{margin:0;font-size:13.8px;color:var(--muted-paper);}
+
+  /* ---------- COSA NON E ---------- */
+  .scope-box.no-box .no{color:#F5A5B0;}
+
+  /* ---------- FINAL CTA ---------- */
+  .final-cta{background:var(--ink);color:var(--paper);text-align:center;padding:64px 0;}
+  .final-cta h2{color:var(--paper);margin:0 0 12px;max-width:none;}
+  .final-cta p.lede{color:#C7D0E0;max-width:48ch;margin:0 auto 30px;font-size:16px;}
+  .final-cta .cta-note{color:#AEB9CF;}
+
+  footer{padding:24px 0 40px;text-align:center;font-family:var(--mono);font-size:11.5px;color:var(--muted-paper);background:var(--ink);}
+
+  @media (max-width:600px){
+    .hero{padding:44px 0 48px;}
+    section{padding:44px 0;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="wrap">
+      <h1>Organizza il tuo viaggio in un unico posto, senza passare ore tra decine di app e tab.</h1>
+      <p class="lede">Inserisci destinazione, date, budget e preferenze. Ricevi un itinerario personalizzato con giornate, attività, spostamenti e dettagli organizzati nella tua dashboard.</p>
+      <div class="route-divider">
+        <span class="dot"></span><span class="line"></span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-1 .1-1.3.5l-.4.6c-.4.6-.2 1.4.4 1.7l5.8 3-2 2.5H4l-1.5 2.5L5 18l1.3 3 2.5-1.5v-3l2.5-2 3 5.8c.3.6 1.1.8 1.7.4l.6-.4c.4-.3.6-.8.5-1.3Z"/></svg>
+        <span class="line"></span><span class="dot"></span>
+      </div>
+      <div class="cta-block">
+        <a href="richiesta-accesso.html" class="btn gold">Prova la beta gratuitamente</a>
+        <p class="cta-note">Per le prime 10 persone che stanno realmente organizzando un viaggio.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="paper">
+    <div class="wrap">
+      <p class="section-label">Come funziona</p>
+      <h2>Tre passaggi, dall'idea alla dashboard</h2>
+      <ol class="steps">
+        <li class="step-item">
+          <span class="tag">01</span>
+          <h3>Inserisci i dettagli</h3>
+          <p>Destinazione, date, budget, numero di persone e preferenze di viaggio: un questionario guidato, pochi minuti.</p>
+        </li>
+        <li class="step-item">
+          <span class="tag">02</span>
+          <h3>Il sistema genera l'itinerario</h3>
+          <p>A partire dalle tue risposte viene costruito un itinerario giorno per giorno, con attività e spostamenti organizzati.</p>
+        </li>
+        <li class="step-item">
+          <span class="tag">03</span>
+          <h3>Consulti e modifichi nella dashboard</h3>
+          <p>Tutto resta in un unico posto: consulti l'itinerario quando vuoi e lo aggiusti se qualcosa cambia.</p>
+        </li>
+      </ol>
+      <div class="mockup">
+        <div class="mockup-bar"><span class="mdot r"></span><span class="mdot y"></span><span class="mdot g"></span><span class="mlabel">dashboard-viaggio.html</span></div>
+        <img src="assets/dashboard-esempio.png" alt="Esempio di dashboard con itinerario, budget, packing list, mappa e link utili, prima di partire" loading="lazy">
+      </div>
+      <p class="mockup-caption">Esempio illustrativo delle sezioni della dashboard — il contenuto reale dipende dal tuo viaggio.</p>
+    </div>
+  </section>
+
+  <section class="deep">
+    <div class="wrap">
+      <p class="section-label">Cosa ricevi</p>
+      <h2>Solo ciò che il prodotto fa davvero</h2>
+      <div class="scope-box">
+        <ul>
+          <li class="yes">✓ Un itinerario organizzato giorno per giorno, con attività e spostamenti.</li>
+          <li class="yes">✓ Una stima di budget suddivisa per voce di spesa.</li>
+          <li class="yes">✓ Una packing list adattata al tuo viaggio.</li>
+          <li class="yes">✓ Informazioni pratiche in un unico posto: documenti, valuta, connettività, emergenze.</li>
+          <li class="yes">✓ Puoi consultare e modificare tutto nella tua dashboard, quando vuoi.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="paper">
+    <div class="wrap">
+      <p class="section-label">Per chi è</p>
+      <h2>Pensato per chi sta organizzando un viaggio vero</h2>
+      <div class="profile-grid">
+        <div class="profile-card">
+          <strong>Famiglie</strong>
+          <p>Coordinare orari, esigenze diverse e più persone senza perdere il filo.</p>
+        </div>
+        <div class="profile-card">
+          <strong>Coppie</strong>
+          <p>Un piano condiviso, senza rincorrersi tra note sparse e chat infinite.</p>
+        </div>
+        <div class="profile-card">
+          <strong>Viaggiatori con budget limitato</strong>
+          <p>Un itinerario che tiene conto di quanto vuoi spendere fin dall'inizio.</p>
+        </div>
+        <div class="profile-card">
+          <strong>Chi organizza più città</strong>
+          <p>Spostamenti e giornate su tappe multiple, organizzati in un solo posto.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="deep">
+    <div class="wrap">
+      <p class="section-label">Cosa non è</p>
+      <h2>Per essere chiari fin da subito</h2>
+      <div class="scope-box no-box">
+        <ul>
+          <li class="no">✗ Non è un'agenzia di viaggi: non prenota voli, hotel o attività al posto tuo.</li>
+          <li class="no">✗ Non sostituisce la verifica ufficiale di orari, prezzi e disponibilità prima della partenza: trattali sempre come stime da controllare.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="final-cta">
+    <div class="wrap">
+      <h2>Pronto a organizzare il tuo prossimo viaggio?</h2>
+      <p class="lede">Inserisci destinazione, date, budget e preferenze. Ricevi un itinerario personalizzato nella tua dashboard.</p>
+      <a href="richiesta-accesso.html" class="btn gold">Prova la beta gratuitamente</a>
+      <p class="cta-note">Per le prime 10 persone che stanno realmente organizzando un viaggio.</p>
+    </div>
+  </div>
+
+  <footer>© 2026</footer>
+
+</body>
+</html>

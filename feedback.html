@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback sulla beta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16233A;
+    --ink-soft:#233555;
+    --paper:#FBF4E8;
+    --paper-deep:#F1E6D2;
+    --stamp:#E8395B;
+    --route:#1F9D8B;
+    --gold:#F2A93B;
+    --muted:#5B6B85;
+    --muted-paper:#7C6A52;
+    --line:#DCCFB4;
+    --radius:14px;
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'Inter', -apple-system, sans-serif;
+    --mono:'IBM Plex Mono', 'Courier New', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#EDE7D9;
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    padding:32px 16px 64px;
+  }
+  .card{
+    max-width:640px;
+    margin:0 auto;
+    background:var(--paper);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 30px 60px -30px rgba(22,35,58,0.35);
+  }
+  header{background:var(--ink);color:var(--paper);padding:36px 40px;}
+  header h1{font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,30px);letter-spacing:-0.01em;margin:0 0 12px;max-width:24ch;}
+  header p{font-size:14.5px;color:#C7D0E0;max-width:52ch;margin:0;}
+
+  main{padding:32px 40px 40px;}
+
+  .field{margin-bottom:22px;}
+  .field label{display:block;font-weight:600;font-size:14px;margin-bottom:7px;}
+  .field .help{font-size:13px;color:var(--muted-paper);margin:4px 0 0;}
+  input[type="text"], input[type="email"], select, textarea{
+    width:100%;font-family:var(--sans);font-size:15px;padding:11px 13px;border:1.5px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);
+  }
+  textarea{resize:vertical;min-height:70px;}
+  input:focus-visible, select:focus-visible, textarea:focus-visible{outline:2px solid var(--route);outline-offset:1px;}
+
+  button.btn{font-family:var(--sans);font-weight:600;font-size:15.5px;padding:14px 26px;border-radius:999px;border:none;cursor:pointer;width:100%;}
+  button.btn.gold{background:var(--gold);color:var(--ink);}
+  button.btn.gold:hover{filter:brightness(1.05);}
+  button.btn:focus-visible{outline:2px solid var(--route);outline-offset:2px;}
+
+  .section-tag{font-family:var(--mono);font-size:11px;color:var(--muted-paper);text-transform:uppercase;letter-spacing:0.04em;margin:30px 0 4px;}
+  .section-tag:first-of-type{margin-top:0;}
+
+  @media (max-width:600px){
+    body{padding:0;}
+    .card{border-radius:0;}
+    header, main{padding-left:22px;padding-right:22px;}
+  }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <header>
+    <h1>Com'è andata?</h1>
+    <p>Qualche minuto per raccontarci come hai usato la dashboard. Le risposte oneste — anche quelle negative — sono quelle che ci servono di più in questa fase.</p>
+  </header>
+
+  <main>
+    <form name="feedback-beta" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/grazie-feedback.html">
+      <input type="hidden" name="form-name" value="feedback-beta">
+      <p style="position:absolute;left:-9999px;">
+        <label>Non compilare questo campo se sei umano: <input name="bot-field" tabindex="-1" autocomplete="off"></label>
+      </p>
+
+      <div class="field">
+        <label for="email">Email con cui hai richiesto l'accesso</label>
+        <input type="email" id="email" name="email" required>
+        <p class="help">Ci serve per collegare questo feedback alle risposte che ci hai già dato.</p>
+      </div>
+
+      <div class="field">
+        <label for="usoDashboard">Hai usato la dashboard per il tuo viaggio reale?</label>
+        <select id="usoDashboard" name="usoDashboard" required>
+          <option value="">Seleziona...</option>
+          <option>Sì, l'ho usata per organizzare tutto il viaggio</option>
+          <option>Sì, ma solo in parte</option>
+          <option>No, non l'ho ancora usata</option>
+        </select>
+      </div>
+
+      <p class="section-tag">Cosa ha funzionato</p>
+
+      <div class="field">
+        <label for="tempoRisparmiato">Cosa ti ha fatto risparmiare più tempo, rispetto a organizzare da solo/a?</label>
+        <textarea id="tempoRisparmiato" name="tempoRisparmiato"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="itinerarioSeguito">Hai seguito l'itinerario così come generato, o l'hai modificato molto?</label>
+        <select id="itinerarioSeguito" name="itinerarioSeguito" required>
+          <option value="">Seleziona...</option>
+          <option>Seguito quasi esattamente</option>
+          <option>Modificato in parte</option>
+          <option>Modificato molto</option>
+          <option>Non l'ho seguito</option>
+        </select>
+      </div>
+
+      <p class="section-tag">Cosa non ha funzionato</p>
+
+      <div class="field">
+        <label for="genericoInutile">C'è stato qualcosa di generico, poco utile o sbagliato?</label>
+        <textarea id="genericoInutile" name="genericoInutile"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="cosaManca">Cosa ti sarebbe stato utile avere, e non c'era?</label>
+        <textarea id="cosaManca" name="cosaManca"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="capitoSituazione">Il prodotto ha capito bene la tua situazione specifica (es. famiglia, budget, gruppo, più città), o ti è sembrato pensato per un viaggiatore generico?</label>
+        <textarea id="capitoSituazione" name="capitoSituazione"></textarea>
+      </div>
+
+      <p class="section-tag">Confronto e valore</p>
+
+      <div class="field">
+        <label for="alternativa">Se non avessi avuto questo strumento, cosa avresti usato?</label>
+        <select id="alternativa" name="alternativa" required>
+          <option value="">Seleziona...</option>
+          <option>ChatGPT, Gemini o un'altra AI generica</option>
+          <option>Ricerche su Google, blog, guide</option>
+          <option>Un'agenzia o un tour operator</option>
+          <option>Non avrei organizzato con lo stesso livello di dettaglio</option>
+          <option>Altro</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="pagherebbe">Pagheresti per questo prodotto?</label>
+        <select id="pagherebbe" name="pagherebbe" required>
+          <option value="">Seleziona...</option>
+          <option>No</option>
+          <option>Sì, intorno a 29€</option>
+          <option>Sì, intorno a 49€</option>
+          <option>Sì, 79€ o più</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="consiglierebbe">Lo consiglieresti a qualcuno che deve organizzare un viaggio?</label>
+        <select id="consiglierebbe" name="consiglierebbe" required>
+          <option value="">Seleziona...</option>
+          <option>Sicuramente sì</option>
+          <option>Probabilmente sì</option>
+          <option>Forse</option>
+          <option>Probabilmente no</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn gold">Invia il feedback</button>
+    </form>
+  </main>
+
+</div>
+</body>
+</html>

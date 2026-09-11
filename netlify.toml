@@ -1,0 +1,12 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/app"
+  to = "/app/generatore-viaggio.html"
+  status = 200
+
+[[redirects]]
+  from = "/app/"
+  to = "/app/generatore-viaggio.html"
+  status = 200
