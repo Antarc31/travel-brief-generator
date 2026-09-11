@@ -36,3 +36,5 @@ npx netlify-cli dev
 - Richiesta accesso: `/richiesta-accesso.html`
 - Prodotto: `/app/`
 - Feedback: `/feedback.html`
+
+<!-- deploy automatico verificato -->
